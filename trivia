@@ -1,0 +1,533 @@
+'''
+AEROPOSTA - 19-05-2020
+
+Producto Mínimo Viable - Lineamientos básicos a seguir.
+Mejor hecho, que perfecto.
+¿funciona? ¿alguien pagaria por jugarlo?
+
+1- Poder elegir si juega 1 o 2 jugadores.
+
+'''
+import pygame, sys
+from pygame.locals import *
+import random as random
+
+#iniciar pygame
+pygame.init()
+
+preguntas = {
+    "aeronautica" : {
+        1 : {
+        "pregunta" : "¿Qué instrumento se usa para medir la temperatura?",
+        "opciones" : {
+                0 : "Anemómetro",
+                1 : "Termómetro",
+                2 : "Hidrómetro",
+                3 : "Amperímetro"
+                },
+        "correcta" : 1
+        },
+        2 : {
+        "pregunta" : "¿Cuáles son los sistemas de control de vuelo primarios, esenciales para el control del avión?",
+        "opciones" : {
+                0 : "Elevador - Alerón – Timón de Dirección",
+                1 : "Elevador - Flaps - Aletas Compensadoras",
+                2 : "Timón - Flaps - Elevador",
+                3 : "Flaps - Slats - Elevador"
+                },
+        "correcta" : 0
+        },
+        3 : {
+        "pregunta" : "¿Pasados cuántos días sin actividad de vuelo, un Piloto Privado de Avión, debe ser readaptado por un Instructor?",
+        "opciones" : {
+                0 : "30 días",
+                1 : "45 días",
+                2 : "60 días",
+                3 : "No es necesario readaptarse"
+                },
+        "correcta" : 0
+        },
+        4 : {
+        "pregunta" : "Dados los siguientes datos: distancia 7 millas náuticas; tiempo 4 minutos. Determinar la velocidad terrestre:",
+        "opciones" : {
+                0 : "10.5 KT",
+                1 : "530 KT",
+                2 : "105 KT",
+                3 : "150 KT"
+                },
+        "correcta" : 2
+        },
+           5 : {
+        "pregunta" : "Si una aeronave debe realizar un Descenso de emergencia, activara su transpondedor en:",
+        "opciones" : {
+                0 : "7600",
+                1 : "7500",
+                2 : "7400",
+                3 : "7700"
+                },
+        "correcta" : 3
+        },
+    },
+    "viajes" : {
+        1 : {
+        "pregunta" : "¿En qué provincia se hace el festival de la cerveza 'october fest'?",
+        "opciones" : {
+                0 : "General Belgrano",
+                1 : "Mar del Plata",
+                2 : "Neuquén",
+                3 : "General Roca"
+                },
+        "correcta" : 0
+        },
+        2 : {
+        "pregunta" : "¿Dónde jugaron un 'partido' de tenis Rafael Nadal y Novak Djokovic en 2013, para promocionar el páis?",
+        "opciones" : {
+                0 : "Cataratas del Iguazú",
+                1 : "Glaciar Perito Moreno",
+                2 : "Quebrada de Humahuaca",
+                3 : "Esteros del Iberá"
+                },
+        "correcta" : 1
+        },
+        3 : {
+        "pregunta" : "¿En qué provincia se encuentra los viñedos ubicados a mayor altitud?",
+        "opciones" : {
+                0 : "San Juan",
+                1 : "Salta",
+                2 : "Mendoza",
+                3 : "Catamarca"
+                },
+        "correcta" : 0
+        },
+        4 : {
+        "pregunta" : "¿Que ruta nacional une Argentina y Chile a través del paso Los libertadores?",
+        "opciones" : {
+                0 : "Ruta nacional 3",
+                1 : "Ruta nacional 40",
+                2 : "Ruta nacional 7",
+                3 : "Ruta nacional 52"
+                },
+        "correcta" : 2
+        },
+           5 : {
+        "pregunta" : "¿En cuál de las siguientes provincias hay más parques nacionales?",
+        "opciones" : {
+                0 : "Misiones",
+                1 : "Mendoza",
+                2 : "Neuquén",
+                3 : "Santa Cruz"
+                },
+        "correcta" : 3
+        },
+    }
+}
+
+
+reloj = pygame.time.Clock()
+
+
+#nombre y caracteristicas de la ventana / proyecto
+pygame.display.set_caption('AEROPOSTA - El videojuego')
+ancho_ventana = 1000
+alto_ventana = 600
+ventana = pygame.display.set_mode((ancho_ventana,alto_ventana), 0, 32)
+
+#establecer una fuente por defecto
+fuente = pygame.font.SysFont(None, 32)
+fuente_mas_pequeña = pygame.font.SysFont(None, 25)
+
+#colores
+gris = (148, 152, 154)
+gris_azulado = (217, 229, 245)
+azul_marino = (0, 106, 151)
+celeste = (128, 211, 247)
+negro = (0, 0, 0)
+rojo = (200, 0, 0)
+
+#llevar el puntaje de cada jugador
+puntaje_jugador_1 = 0
+
+#estado de jugador.
+esperando_respuesta_jugador = False
+
+#turno de juego (va a mostrar el numero de indice de la lista de preguntas que ya seleccionamos)
+indice_turno = 0
+
+mostrando_correcto_incorrecto = False
+turno_en_curso = True
+fin_juego = False
+
+#crear una funcion que dibuje texto en pantalla
+def dibujar_texto(texto, fuente, color, superficie, x, y):
+    texto_objeto = fuente.render(texto, 1, color)
+    texto_rect = texto_objeto.get_rect()
+    texto_rect.topleft = (x, y)
+    superficie.blit(texto_objeto, texto_rect)
+
+
+#def dibujar_boton(mensaje, x, y, ancho, alto, color_inactivo, color_activo):
+
+def esperar_jugador():
+    global esperando_jugador
+    ejecutando = True 
+    while ejecutando != False:
+        
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            #if evento.type == KEYDOWN and evento.key == K_f:
+            if evento.type == pygame.KEYDOWN:
+                if evento.key == pygame.K_q:
+                    esperando_jugador = False
+                    ejecutando = False 
+                    return 0
+                elif evento.key == pygame.K_w:
+                    esperando_jugador = False
+                    ejecutando = False
+                    return 1
+                elif evento.key == pygame.K_e:
+                    esperando_jugador = False
+                    ejecutando = False
+                    return 2
+                elif evento.key == pygame.K_r:
+                    esperando_jugador = False
+                    ejecutando = False
+                    return 3
+
+def esperar_jugador_siguiente_pregunta():
+    
+    ejecutando = True 
+    while ejecutando != False:
+        
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+                
+            
+            if evento.type == pygame.KEYDOWN:
+                if evento.key == pygame.K_s:
+                    ejecutando = False 
+                    return 1
+
+
+
+def esperar_respuesta_jugador():
+    pygame.event.clear()
+    while True:
+        evento = pygame.event.wait()
+        
+        if evento.type == QUIT:
+            pygame.quit()
+            sys.exit()
+        elif evento.type == KEYDOWN: # Selecciona una respuesta
+            if evento.key == K_q:
+               return 0
+            elif evento.key == K_w:
+                return 1
+            elif evento.key == K_e:
+                return 2
+            elif evento.key == K_r:
+                return 3
+        
+
+
+
+def crear_lista_preguntas_cuestionario(diccionario, categoria):
+    lista_de_preguntas = []
+    for pregunta in diccionario[categoria]:
+        #print(pregunta)
+        lista_de_preguntas.append(pregunta)
+
+    #print(lista_de_preguntas)
+
+    random.shuffle(lista_de_preguntas, random.random)
+
+    #print("desordenada aeronautica")
+    #print(lista_de_preguntas)
+
+    #tomo la cantidad de preguntas que necesito nada mas
+
+    lista_preg_test = []
+
+    for pregunta in lista_de_preguntas:
+        if len(lista_preg_test) < 3:
+            lista_preg_test.append(pregunta)
+        else:
+            break
+
+    return lista_preg_test
+
+lista_preguntas_aeronauticas = crear_lista_preguntas_cuestionario(preguntas, "aeronautica")
+print("corroborando lista de preguntas de aeronautica para este turno")
+print(lista_preguntas_aeronauticas)
+
+lista_preguntas_viajes = crear_lista_preguntas_cuestionario(preguntas, "viajes")
+print("corroborando lista de preguntas de viajes para este turno")
+print(lista_preguntas_viajes)
+
+
+def resolver(diccionario, categoria, pregunta, respuesta):
+    if preguntas[categoria][pregunta]["correcta"] == respuesta:
+        return True
+    else:
+        return False
+
+
+def dibujar_pregunta(categoria,pregunta_id, turno):
+  ancho_boton_respuesta = 40
+
+  #dibujo la pregunta en la pantalla
+  dibujar_texto(preguntas[categoria][pregunta_id]["pregunta"], fuente_mas_pequeña, (255, 255, 255), ventana, 20, 150)
+
+  #respuesta
+  dibujar_texto(preguntas[categoria][pregunta_id]["opciones"][0], fuente_mas_pequeña, (0, 0, 0), ventana, (ancho_boton_respuesta+20), 300)
+  dibujar_texto(preguntas[categoria][pregunta_id]["opciones"][1], fuente_mas_pequeña, (0, 0, 0), ventana, (ancho_boton_respuesta+20), 350)
+  dibujar_texto(preguntas[categoria][pregunta_id]["opciones"][2], fuente_mas_pequeña, (0, 0, 0), ventana, (ancho_boton_respuesta+20), 400)
+  dibujar_texto(preguntas[categoria][pregunta_id]["opciones"][3], fuente_mas_pequeña, (0, 0, 0), ventana, (ancho_boton_respuesta+20), 450)
+
+
+
+def juego_preguntas():
+    
+    global puntaje_jugador_1, esperando_respuesta_jugador, indice_turno, mostrando_correcto_incorrecto, fin_juego
+          
+    funcionando = True
+    
+    while funcionando:
+        
+        
+        
+        ventana.fill(gris)
+
+        dibujar_texto("Trivia de preguntas", fuente, (255, 200, 0), ventana, ((ancho_ventana/2)-100), 20)
+        
+
+        click = False
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if evento.type == pygame.KEYDOWN:
+                if evento.key == pygame.K_ESCAPE:
+                    funcionando = False
+    
+            if evento.type == pygame.MOUSEBUTTONDOWN:
+                if evento.button == 1:
+                    click = True
+
+        #detecto la posicion del mouse
+        mx, my = pygame.mouse.get_pos()
+
+        #dibujo el fondo del juego
+        alto_fondo_jugadores = 80
+
+        alto_fondo_categoria = 50
+        fondo_categoria = pygame.Rect(0, (alto_fondo_jugadores), ancho_ventana, alto_fondo_categoria)
+        pygame.draw.rect(ventana, celeste, fondo_categoria)
+
+        alto_fondo_preguntas = 100
+        fondo_preguntas = pygame.Rect(0, (alto_fondo_jugadores+alto_fondo_categoria), ancho_ventana, alto_fondo_preguntas)
+        pygame.draw.rect(ventana, azul_marino, fondo_preguntas)
+
+        alto_fondo_respuestas = 300
+        fondo_respuestas = pygame.Rect(0, (alto_fondo_jugadores+alto_fondo_categoria+alto_fondo_preguntas), ancho_ventana, alto_fondo_respuestas)
+        pygame.draw.rect(ventana, gris_azulado, fondo_respuestas)
+
+        ancho_boton_salir = 40
+        boton_pausa = pygame.Rect(20, 10, ancho_boton_salir, ancho_boton_salir)
+        boton_salir = pygame.Rect((ancho_ventana-ancho_boton_salir-20), 10, ancho_boton_salir, ancho_boton_salir)
+
+        #detecto la colision del mouse en los botones, y los hago interactivos con colores activos e inactivos
+        if boton_pausa.collidepoint(mx, my):
+            pygame.draw.rect(ventana, azul_marino, boton_pausa)
+            if click:
+                pass
+        else:
+            pygame.draw.rect(ventana, gris_azulado, boton_pausa)
+
+        ##detecto la colision del mouse en los botones, y los hago interactivos con colores activos e inactivos
+        if boton_salir.collidepoint(mx, my):
+            pygame.draw.rect(ventana, rojo, boton_salir)
+            if click:
+                pass
+        else:
+            pygame.draw.rect(ventana, azul_marino, boton_salir)
+
+        #dibujo los rectangulos en la pantalla
+
+        dibujar_texto("Salir", fuente, (255,0,0), ventana, (ancho_ventana-65), (18+ancho_boton_salir))
+        dibujar_texto("Pausa", fuente, (47, 132, 41), ventana, 10, (18+ancho_boton_salir))
+
+        ancho_boton_respuesta = 40
+        boton_respuesta_0 = pygame.Rect(20, 300, ancho_boton_respuesta, ancho_boton_respuesta)
+        boton_respuesta_1 = pygame.Rect(20, 350, ancho_boton_respuesta, ancho_boton_respuesta)
+        boton_respuesta_2 = pygame.Rect(20, 400, ancho_boton_respuesta, ancho_boton_respuesta)
+        boton_respuesta_3 = pygame.Rect(20, 450, ancho_boton_respuesta, ancho_boton_respuesta)
+
+        #detecto la colision del mouse en los botones
+        if boton_respuesta_0.collidepoint(mx, my):
+            if click:
+                #respuesta 0
+                pass
+        if boton_respuesta_1.collidepoint(mx, my):
+            if click:
+                #respuesta 1
+                pass
+        if boton_respuesta_2.collidepoint(mx, my):
+            if click:
+                #respuesta 2
+    	        pass
+        if boton_respuesta_3.collidepoint(mx, my):
+            if click:
+                #respuesta 3
+                pass
+
+        #dibujo los rectangulos en la pantalla
+        pygame.draw.rect(ventana, (0, 0, 0), boton_respuesta_0)
+        pygame.draw.rect(ventana, (0, 0, 0), boton_respuesta_1)
+        pygame.draw.rect(ventana, (0, 0, 0), boton_respuesta_2)
+        pygame.draw.rect(ventana, (0, 0, 0), boton_respuesta_3)
+
+        ancho_boton_respuesta = 40
+        boton_respuesta_0_jugador_2 = pygame.Rect((ancho_ventana-20-ancho_boton_respuesta), 300, ancho_boton_respuesta, ancho_boton_respuesta)
+        boton_respuesta_1_jugador_2 = pygame.Rect((ancho_ventana-20-ancho_boton_respuesta), 350, ancho_boton_respuesta, ancho_boton_respuesta)
+        boton_respuesta_2_jugador_2 = pygame.Rect((ancho_ventana-20-ancho_boton_respuesta), 400, ancho_boton_respuesta, ancho_boton_respuesta)
+        boton_respuesta_3_jugador_2 = pygame.Rect((ancho_ventana-20-ancho_boton_respuesta), 450, ancho_boton_respuesta, ancho_boton_respuesta)
+
+        #detecto la colision del mouse en los botones
+        if boton_respuesta_0_jugador_2.collidepoint(mx, my):
+            pygame.draw.rect(ventana, (255, 0, 0), boton_respuesta_0_jugador_2)
+
+            if click:
+                #respuesta 0
+                pass
+        else:
+            pygame.draw.rect(ventana, (0, 255, 0), boton_respuesta_0_jugador_2)
+
+        if boton_respuesta_1_jugador_2.collidepoint(mx, my):
+            if click:
+                #respuesta 1
+                pass
+        if boton_respuesta_2_jugador_2.collidepoint(mx, my):
+            if click:
+                #respuesta 2
+    	        pass
+        if boton_respuesta_3_jugador_2.collidepoint(mx, my):
+            if click:
+                #respuesta 3
+                pass
+
+        #dibujo los rectangulos en la pantalla
+
+        pygame.draw.rect(ventana, (0, 0, 0), boton_respuesta_1_jugador_2)
+        pygame.draw.rect(ventana, (0, 0, 0), boton_respuesta_2_jugador_2)
+        pygame.draw.rect(ventana, (0, 0, 0), boton_respuesta_3_jugador_2)
+        print("fin del juego es : ")
+        print(fin_juego)
+        #actualizar el puntaje del jugador
+        if fin_juego == False:
+            dibujar_texto("Puntaje Total: " + str(puntaje_jugador_1), fuente, (255,0,0), ventana, (ancho_ventana/2), 500)
+            pygame.display.update()
+        
+            #elegir la pregunta segun el turno
+            #si el turno es 0, se accede a la lista en ese indice
+            if len(lista_preguntas_aeronauticas) > indice_turno:
+                num_de_pregunta = lista_preguntas_aeronauticas[indice_turno]
+
+                print("esta es la lista aeronautica")
+                print(lista_preguntas_aeronauticas)
+                print("numero de turno")
+                print(indice_turno)
+                print("esto imprime el num esta dentro de la lista en el indice del turno")
+                print(num_de_pregunta)
+
+        
+                #dibuja la pregunta y sus respuestas en la pantalla, y el turno de juego
+                dibujar_pregunta("aeronautica", num_de_pregunta, indice_turno)
+                pygame.display.update()
+        
+                #cambio la condicion de la bandera de esperar al jugador
+                esperando_respuesta_jugador = True
+
+                #creo la condicion para saber si la respuesta es correcta o no 
+                if esperando_respuesta_jugador == True:
+                    print("esperar resp jugador = ")
+                    print(esperando_respuesta_jugador)
+                    respuesta_jugador1 = esperar_jugador()
+            
+                    print(respuesta_jugador1)
+
+                    esperando_respuesta_jugador = False 
+                    print("el jugador ya pulso una tecla - esperar resp jugador = ")
+                    print(esperando_respuesta_jugador)
+                    print("Compara la resp del jugador con la respuesta correcta")
+                    print(resolver(preguntas, "aeronautica", num_de_pregunta, respuesta_jugador1))
+        
+
+                    mostrando_correcto_incorrecto = True
+                    if resolver(preguntas, "aeronautica", num_de_pregunta, respuesta_jugador1) == True:
+                        print("respuesta correcta sumas 100")
+                        if esperando_respuesta_jugador == False and mostrando_correcto_incorrecto == True:
+                            dibujar_texto("respuesta correcta sumas 100 puntos", fuente, (255,0,0), ventana, (ancho_ventana/2), 200)
+                            dibujar_texto("Presiona S para ir a la proxima pregunta o ESC para salir del juego", fuente, (255,0,0), ventana, 20, 400)
+                            pygame.display.update()
+                            puntaje_jugador_1 += 100
+                            print("puntaje del jugador")
+                            print(puntaje_jugador_1)
+                            indice_turno += 1
+                            print("turno numero: ")
+                            print(indice_turno)
+                    
+
+
+                    
+                    else:
+                        print("respuesta incorrecta")
+                        dibujar_texto("respuesta incorrecta no sumas puntos", fuente, (255,0,0), ventana, (ancho_ventana/2), 200)
+                        dibujar_texto("Presiona S para ir a la proxima pregunta ", fuente, (255,0,0), ventana, 20, 400)
+                        pygame.display.update()
+                        print("puntaje del jugador")
+                        print(puntaje_jugador_1)
+                        indice_turno += 1
+                        print("turno numero: ")
+                        print(indice_turno)
+
+            
+                else:
+                    print("esperando jugador = false ")
+        
+                dibujar_texto("Presiona S para ir a la proxima pregunta ", fuente, (255,0,0), ventana, 20, 400)
+                continuar = esperar_jugador_siguiente_pregunta()
+                print("S es 1 : ")
+                print(continuar)
+
+                if continuar == 1:
+                    mostrando_correcto_incorrecto = False
+
+
+                    
+            else:
+           
+                fin_juego = True 
+                print("cambio fin del juego y ahora es : ")
+                print(fin_juego)
+            
+
+        else:
+            print("Fin del juego")
+            fin = pygame.Rect(0, 0, ancho_ventana, alto_ventana)
+            pygame.draw.rect(ventana, (0, 0, 0), fin)
+            dibujar_texto("fin del juego", fuente, (255,0,0), ventana, (ancho_ventana/2), 550)
+            dibujar_texto("Puntaje Total: " + str(puntaje_jugador_1), fuente, (255,0,0), ventana, (ancho_ventana/2), 500)
+            
+            pygame.display.update()
+            reloj.tick(20)
+        
+        pygame.display.update()
+        
+        reloj.tick(60)
+
+
+juego_preguntas()
