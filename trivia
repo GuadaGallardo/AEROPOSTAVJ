@@ -724,6 +724,9 @@ def juego_preguntas():
                     if continuar == 4:
                         mostrando_correcto_incorrecto = False
                         comprobar = False
+                 
+                if len(lista_preguntas_aeronauticas) > indice_turno:
+                    juego_scroll()
 
 
         ventana.blit(logo, logoRect)
