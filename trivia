@@ -767,7 +767,12 @@ def juego_preguntas():
 # --------------------###################-------------------------------------##############
 
 def menu_principal():
-    global juegoMultijugador, fin_juego, lista_preguntas_aeronauticas, lista_preguntas_viajes
+    global juegoMultijugador, fin_juego, lista_preguntas_aeronauticas, lista_preguntas_viajes, indice_turno, puntaje_jugador_1, puntaje_jugador_2
+
+    fin_juego = False
+    indice_turno = 0
+    puntaje_jugador_1 = 0
+    puntaje_jugador_2 = 0
 
     lista_preguntas_aeronauticas = crear_lista_preguntas_cuestionario(preguntas, "aeronautica")
     print("corroborando lista de preguntas de aeronautica para este turno")
@@ -786,7 +791,6 @@ def menu_principal():
                   ventana, (ancho_ventana / 3) - 50, 550)
     pygame.display.update()
 
-    fin_juego = False
 
     menu = True
     while menu:
