@@ -40,6 +40,7 @@ def dibujar_texto(texto, fuente, color, superficie, x, y):
     superficie.blit(texto_objeto, texto_rect)
     return texto_rect
 
+
 # espera los eventos
 def esperar_jugador():
     ejecutando = True
@@ -55,7 +56,7 @@ def esperar_jugador():
                 if evento.key == K_ESCAPE:  # Sale del juego al presionar ESCAPE
                     cerrar_juego()
                     return 10
-                #teclas de respuesta del jugador 1
+                # teclas de respuesta del jugador 1
                 elif evento.key == pygame.K_q:
                     ejecutando = False
                     return 0
@@ -68,26 +69,26 @@ def esperar_jugador():
                 elif evento.key == pygame.K_r:
                     ejecutando = False
                     return 3
-                #avanzar en las preguntas
+                # avanzar en las preguntas
                 elif evento.key == pygame.K_s:
                     ejecutando = False
                     return 4
-                #esblecer cantidad de jugadores
+                # esblecer cantidad de jugadores
                 elif evento.key == pygame.K_1:
                     ejecutando = False
                     return 5
                 elif evento.key == pygame.K_2:
                     ejecutando = False
                     return 6
-                #pausa
+                # pausa
                 elif evento.key == pygame.K_SPACE:
                     ejecutando = False
                     return 7
-                #avanzar a la trivia
+                # avanzar a la trivia
                 elif evento.key == pygame.K_t:
                     ejecutando = False
                     return 8
-                #menu
+                # menu
                 elif evento.key == pygame.K_m:
                     ejecutando = False
                     return 9
@@ -104,10 +105,14 @@ def esperar_jugador():
                 elif evento.key == pygame.K_p:
                     ejecutando = False
                     return 14
+                elif evento.key == pygame.K_n:
+                    ejecutando = False
+                    return 15
 
-                #cualquier otra tecla
+                # cualquier otra tecla
                 else:
                     return
+
 
 '''
 #crea un contador que decrece (timer)
@@ -122,6 +127,7 @@ def timer():
             texto_timer = str(contador).rjust(3) if contador > 0 else 'Fin!'
  #### como usarla ####
 '''
+
 
 # --------------------###################-------------------------------------##############
 # funciones del juego trivia
@@ -193,12 +199,20 @@ def jugadorGolpeaMoneda(rectanguloJugador, monedas):
 # --------------------###################-------------------------------------##############
 
 def juego_scroll():
-
-    global juegoSolitario, juegoMultijugador
+    global juegoMultijugador, monedas_jugador_1, monedas_jugador_2
 
     # Muestra la pantalla inicial
-    ventana.blit(logo, logoRect)
+    ventana.blit(imagentransicion_carrera, transicion_carreraRect)
+    dibujar_texto('Las monedas que consigas se suman a tus puntos.', fuente_pequeña, azul_marino, ventana, 200, 450)
     dibujar_texto('Presione una tecla para comenzar.', fuente, azul_marino, ventana, 230, 500)
+    # Detiene la musica
+    pygame.mixer.music.stop()
+    #cargar nueva cancion
+    pygame.mixer.music.load('musicafondo2.wav')
+
+    # inicio la musica
+    pygame.mixer.music.play(-1, 0.0)
+
     pygame.display.update()
     esperar_jugador()
 
@@ -212,14 +226,13 @@ def juego_scroll():
     posicion_en_y1 = -alto
 
     # establezco el contador
-    contador, texto_timer = 10, '10'.rjust(3)  # justifica el texto en la cantidad de "caracteres" que se le da el segundo argumento
+    contador, texto_timer = 10, '10'.rjust(
+        3)  # justifica el texto en la cantidad de "caracteres" que se le da el segundo argumento
     pygame.time.set_timer(pygame.USEREVENT, 1000)  # 1000 milisegundos equivalen a 1 segundo
 
     # este no es el bucle del juego
     corriendo = True
     while corriendo:
-
-
 
         monedas = []
         cantidad_monedas_1 = 0
@@ -231,6 +244,13 @@ def juego_scroll():
         moverIzquierda2 = moverDerecha2 = moverArriba2 = moverAbajo2 = False
         contadorAgregarMoneda = 0
 
+        # Detiene la musica
+        pygame.mixer.music.stop()
+        # cargar nueva cancion
+        pygame.mixer.music.load('musicaFondo3.wav')
+
+        # inicio la musica
+        pygame.mixer.music.play(-1, 0.0)
 
         # este es el bucle del juego
         funcionando = True
@@ -239,12 +259,9 @@ def juego_scroll():
 
             for evento in pygame.event.get():
 
-
                 if evento.type == QUIT:
                     cerrar_juego()
                     funcionando = False
-
-
 
                 if evento.type == pygame.KEYDOWN:
                     if evento.key == K_ESCAPE:
@@ -302,17 +319,12 @@ def juego_scroll():
                         if evento.key == K_DOWN:
                             moverAbajo2 = False
 
-                #timer
+                # timer
                 if evento.type == pygame.USEREVENT:
                     contador -= 1
                     texto_timer = str(contador).rjust(3) if contador > 0 else 'Fin!'
-                    if contador < -1:
+                    if contador == 0:
                         funcionando = False
-
-
-
-
-
 
             # definir el scroll de fondo
             posicion_en_y1 += 2
@@ -357,11 +369,13 @@ def juego_scroll():
 
             if jugadorGolpeaMoneda(rectanguloJugador, monedas):
                 cantidad_monedas_1 += 1  # incrementa el puntaje
+                sonidoSumaMoneda.play()
 
             if juegoMultijugador == True:
 
                 if jugadorGolpeaMoneda(rectanguloJugador2, monedas):
                     cantidad_monedas_2 += 1  # incrementa el puntaje
+                    sonidoSumaMoneda.play()
 
             # Mueve el avion del jugador 1.
             if moverIzquierda and rectanguloJugador.left > 0:
@@ -385,7 +399,6 @@ def juego_scroll():
                 if moverAbajo2 and rectanguloJugador2.bottom < alto_ventana:
                     rectanguloJugador2.move_ip(0, movimiento_jugador)
 
-
             # Dibuja cantidad de monedas
             dibujar_texto('Monedas: %s' % (cantidad_monedas_1), fuente_pequeña, verde_brillante, ventana, 10, 0)
 
@@ -397,75 +410,92 @@ def juego_scroll():
                               0)
                 ventana.blit(imagenJugador2, rectanguloJugador2)
 
-            #timer
+            # timer
             dibujar_texto(texto_timer, fuente_timer, azul_marino, ventana, 480, 10)
-
 
             pygame.display.update()
             reloj.tick(60)
 
-        # Detiene el juego y muestra "Juego Terminado"
+        monedas_jugador_1 += cantidad_monedas_1
+        if juegoMultijugador == True:
+            monedas_jugador_2 += cantidad_monedas_2
 
-        dibujar_texto('Juego Terminado', fuente, negro, ventana, (ancho_ventana / 3), (alto_ventana / 3))
-        dibujar_texto('Presiona T para avanzar a la trivia', fuente_pequeña, azul_marino, ventana,
-                      (ancho_ventana / 3) - 80, (alto_ventana / 3) + 50)
-        dibujar_texto('o M para salir y volver menú', fuente_pequeña, azul_marino, ventana,
-                      (ancho_ventana / 3) - 80, (alto_ventana / 3) + 80)
-
-        pygame.display.update()
-
-        comprobando = True
-        while comprobando:
-
-            jugar_trivia = esperar_jugador()
-
-            # compara con la funcion que defini de eventos
-
-            # la letra T retorna 8
-            if jugar_trivia == 8:
-                juego_preguntas()
-                comprobando = False
-                corriendo = False
-
-            # la letra M retorna como 9
-            elif jugar_trivia == 9:
-
-                if juegoMultijugador == True:
-                    juegoMultijugador = False
-                menu_principal()
-                comprobando = False
-                corriendo = False
-
-
-        reloj.tick(15)
-
+        juego_preguntas()
 
 # --------------------###################-------------------------------------##############
+
+
 def juego_preguntas():
     global esperando_respuesta_jugador, esperando_respuesta_jugador2, indice_turno, mostrando_correcto_incorrecto, mostrando_correcto_incorrecto2, fin_juego, juegoMultijugador
     global monedas_jugador_1, monedas_jugador_2, puntaje_jugador_1, puntaje_jugador_2, lista_preguntas_aeronauticas, lista_preguntas_viajes
 
     # Muestra la pantalla inicial
-    ventana.blit(logo, logoRect)
+    ventana.blit(imagentransicion_trivia, transicion_triviaRect)
     # dibujo puntaje y cantidad de items (monedas, etc)
     dibujar_texto("Jugador 1: ", fuente_pequeña, negro, ventana, 10, 460)
     dibujar_texto("Puntos: " + str(puntaje_jugador_1), fuente_pequeña, azul_marino, ventana, 10, 490)
     dibujar_texto("Monedas: " + str(monedas_jugador_1), fuente_pequeña, azul_marino, ventana, 10, 520)
+
+    # Detiene la musica
+    pygame.mixer.music.stop()
+    # cargar nueva cancion
+    pygame.mixer.music.load('musicaFondo2.wav')
+
+    # inicio la musica
+    pygame.mixer.music.play(-1, 0.0)
 
     if juegoMultijugador == True:
         dibujar_texto("Jugador 2: ", fuente_pequeña, negro, ventana, 800, 460)
         dibujar_texto("Puntos: " + str(puntaje_jugador_1), fuente_pequeña, azul_marino, ventana, 800, 490)
         dibujar_texto("Monedas: " + str(monedas_jugador_1), fuente_pequeña, azul_marino, ventana, 800, 520)
 
-    dibujar_texto('Presione una tecla para comenzar.', fuente, azul_marino, ventana, 230, 550)
+
+    # Detiene el juego y muestra "Juego Terminado"
+
+    dibujar_texto('Juego Terminado', fuente, negro, ventana, (ancho_ventana / 3), (alto_ventana / 3))
+    dibujar_texto('Presiona T para avanzar a la trivia', fuente_pequeña, azul_marino, ventana,
+                  (ancho_ventana / 3) - 80, (alto_ventana / 3) + 50)
+    dibujar_texto('o M para salir y volver menú', fuente_pequeña, azul_marino, ventana,
+                  (ancho_ventana / 3) - 80, (alto_ventana / 3) + 80)
+
     pygame.display.update()
-    esperar_jugador()
+
+    comprobando = True
+    while comprobando:
+
+        jugar_trivia = esperar_jugador()
+
+        # compara con la funcion que defini de eventos
+
+        # la letra T retorna 8
+        if jugar_trivia == 8:
+            comprobando = False
+
+
+        # la letra M retorna como 9
+        elif jugar_trivia == 9:
+
+            if juegoMultijugador == True:
+                juegoMultijugador = False
+            menu_principal()
+            comprobando = False
+
+
+    reloj.tick(15)
 
     preguntando = True
     while preguntando:
 
         jugador1_acerto = True
         jugador2_acerto = True
+
+        # Detiene la musica
+        pygame.mixer.music.stop()
+        # cargar nueva cancion
+        pygame.mixer.music.load('musicaFondo5.wav')
+
+        # inicio la musica
+        pygame.mixer.music.play(-1, 0.0)
 
         # bucle del juego
         funcionando = True
@@ -738,44 +768,6 @@ def juego_preguntas():
                         else:
                             continue
 
-                        '''
-                        esperando_respuesta_jugador2 = True
-                        # creo la condicion para saber si la respuesta es correcta o no
-                        if jugador2_acerto == False:
-
-                            comprobar_respuesta2 = True
-                            while comprobar_respuesta2:
-
-                                # el jugador  2 presiona una tecla
-                                respuesta_jugador2 = esperar_jugador()
-                                print(respuesta_jugador2)
-
-                                if respuesta_jugador2 == 11:
-                                    respuesta_jugador2 = 0
-                                    dibujar_texto("U", fuente, negro, ventana, (ancho_ventana - 50), 270)
-                                    comprobar_respuesta2 = False
-                                elif respuesta_jugador2 == 12:
-                                    respuesta_jugador2 = 1
-                                    dibujar_texto("I", fuente, negro, ventana, (ancho_ventana - 50), 335)
-                                    comprobar_respuesta2 = False
-                                elif respuesta_jugador2 == 13:
-                                    respuesta_jugador2 = 2
-                                    dibujar_texto("O", fuente, negro, ventana, (ancho_ventana - 50), 400)
-                                    comprobar_respuesta2 = False
-                                elif respuesta_jugador2 == 14:
-                                    respuesta_jugador2 = 3
-                                    dibujar_texto("P", fuente, negro, ventana, (ancho_ventana - 50), 465)
-                                    comprobar_respuesta2 = False
-
-                            print("el o los jugadores ya pulso una tecla - esperar resp jugador = ")
-                            print(esperando_respuesta_jugador2)
-                            print("Compara la resp del jugador 2 con la respuesta correcta")
-                            print(resolver(preguntas, "viajes", num_de_pregunta_viajes,
-                                           respuesta_jugador2))
-
-                            pygame.display.update()
-                            esperando_respuesta_jugador2 = False
-                        '''
                         if esperando_respuesta_jugador == False:  # or esperando_respuesta_jugador2 == False:
 
                             # compara resultado de la resp del jugador 1 con la correcta
@@ -801,33 +793,6 @@ def juego_preguntas():
                                 print("puntaje del jugador")
                                 print(puntaje_jugador_1)
 
-                            '''
-                            # comprueba la respuesta del jugador 2 con la correcta
-
-                            if resolver(preguntas, "viajes", num_de_pregunta_viajes, respuesta_jugador2) == True:
-                                print("respuesta correcta sumas 50")
-
-                                dibujar_texto("Correcto: sumas 50 puntos", fuente_mas_pequeña,
-                                              verde_brillante,
-                                              ventana, 600,
-                                              520)
-                                pygame.display.update()
-                                puntaje_jugador_2 += 50
-                                print("puntaje del jugador")
-                                print(puntaje_jugador_2)
-
-
-                            else:
-                                print("respuesta incorrecta")
-                                dibujar_texto("Incorrecto: no sumas puntos", fuente_mas_pequeña, amarillo,
-                                              ventana, 600,
-                                              520)
-
-
-                                pygame.display.update()
-                                print("puntaje del jugador 2")
-                                print(puntaje_jugador_2)
-                            '''
 
                         else:
                             continue
@@ -874,44 +839,7 @@ def juego_preguntas():
                             dibujar_pregunta("viajes", num_de_pregunta_viajes, indice_turno)
                             pygame.display.update()
 
-                        '''
-                        # cambio la condicion de la bandera de esperar al jugador
-                        esperando_respuesta_jugador = True
 
-                        # creo la condicion para saber si la respuesta es correcta o no
-                        if esperando_respuesta_jugador == True:
-
-                            comprobar_respuesta = True
-                            while comprobar_respuesta:
-
-                                # el jugador presiona una tecla
-                                respuesta_jugador1 = esperar_jugador()
-                                print(respuesta_jugador1)
-
-                                if respuesta_jugador1 == 0:
-                                    dibujar_texto("Q", fuente, negro, ventana, 30, 270)
-                                    comprobar_respuesta = False
-                                elif respuesta_jugador1 == 1:
-                                    dibujar_texto("W", fuente, negro, ventana, 30, 335)
-                                    comprobar_respuesta = False
-                                elif respuesta_jugador1 == 2:
-                                    dibujar_texto("E", fuente, negro, ventana, 30, 400)
-                                    comprobar_respuesta = False
-                                elif respuesta_jugador1 == 3:
-                                    dibujar_texto("R", fuente, negro, ventana, 30, 465)
-                                    comprobar_respuesta = False
-
-                            print("el o los jugadores ya pulso una tecla - esperar resp jugador = ")
-                            print(esperando_respuesta_jugador)
-                            print("Compara la resp del jugador con la respuesta correcta")
-                            print(
-                                resolver(preguntas, "viajes", num_de_pregunta_viajes, respuesta_jugador1))
-                            pygame.display.update()
-                            esperando_respuesta_jugador = False
-                        else:
-                            continue
-
-                        '''
                         esperando_respuesta_jugador2 = True
                         # creo la condicion para saber si la respuesta es correcta o no
                         if esperando_respuesta_jugador2 == True:
@@ -953,31 +881,6 @@ def juego_preguntas():
                         #if esperando_respuesta_jugador == False:  # or
                         if esperando_respuesta_jugador2 == False:
 
-                            '''
-                            # compara resultado de la resp del jugador 1 con la correcta
-                            if resolver(preguntas, "viajes", num_de_pregunta_viajes, respuesta_jugador1) == True:
-                                print("respuesta correcta sumas 50")
-
-                                dibujar_texto("Correcto: sumas 50 puntos", fuente_mas_pequeña, verde_brillante,
-                                              ventana, 20, 520)
-
-                                pygame.display.update()
-
-                                puntaje_jugador_1 += 50
-                                print("puntaje del jugador")
-                                print(puntaje_jugador_1)
-
-                            else:
-                                print("Respuesta incorrecta")
-                                dibujar_texto("Incorrecto: no sumas puntos", fuente_mas_pequeña, amarillo,
-                                              ventana,
-                                              20, 520)
-                                pygame.display.update()
-
-                                print("puntaje del jugador")
-                                print(puntaje_jugador_1)
-
-                            '''
                             # comprueba la respuesta del jugador 2 con la correcta
 
                             if resolver(preguntas, "viajes", num_de_pregunta_viajes, respuesta_jugador2) == True:
@@ -1364,6 +1267,13 @@ def juego_preguntas():
                     juego_scroll()
 
         ventana.blit(logo, logoRect)
+        # Detiene la musica
+        pygame.mixer.music.stop()
+        # cargar nueva cancion
+        pygame.mixer.music.load('musicaFondo1.wav')
+        # inicio la musica
+        pygame.mixer.music.play(-1, 0.0)
+
         fin_juego = True
         print("Fin del juego")
 
@@ -1410,16 +1320,22 @@ def juego_preguntas():
         pygame.display.update()
         reloj.tick(20)
 
+
 # --------------------###################-------------------------------------##############
 
 def menu_principal():
-    global juegoMultijugador, fin_juego, lista_preguntas_aeronauticas, lista_preguntas_viajes, indice_turno, puntaje_jugador_1, puntaje_jugador_2
+    global juegoMultijugador, fin_juego, lista_preguntas_aeronauticas, lista_preguntas_viajes, indice_turno
+    global monedas_jugador_1, monedas_jugador_2, puntaje_jugador_1, puntaje_jugador_2
 
+    # reinicio el estado (las variables) del juego a cero, para iniciar una nueva partida
     fin_juego = False
     indice_turno = 0
     puntaje_jugador_1 = 0
     puntaje_jugador_2 = 0
+    monedas_jugador_1 = 0
+    monedas_jugador_2 = 0
 
+    # escojo las preguntas para esta partida
     lista_preguntas_aeronauticas = crear_lista_preguntas_cuestionario(preguntas, "aeronautica")
     print("corroborando lista de preguntas de aeronautica para este turno")
     print(lista_preguntas_aeronauticas)
@@ -1427,7 +1343,6 @@ def menu_principal():
     lista_preguntas_viajes = crear_lista_preguntas_cuestionario(preguntas, "viajes")
     print("corroborando lista de preguntas de viajes para este turno")
     print(lista_preguntas_viajes)
-
 
     # Muestra la pantalla del inicial
     ventana.blit(logo, logoRect)
@@ -1437,6 +1352,8 @@ def menu_principal():
                   ventana, (ancho_ventana / 3) - 50, 550)
     pygame.display.update()
 
+    #inicio la musica
+    pygame.mixer.music.play(-1, 0.0)
 
     menu = True
     while menu:
@@ -1464,8 +1381,9 @@ def menu_principal():
             juegoMultijugador = True
             menu = False
 
-        pygame.display.update()
-        reloj.tick(15)
+
+    pygame.display.update()
+    reloj.tick(15)
 
 
 # --------------------###################-------------------------------------##############
@@ -1476,7 +1394,7 @@ pygame.init()
 reloj = pygame.time.Clock()
 
 # nombre y caracteristicas de la ventana / proyecto
-pygame.display.set_caption('AEROPOSTA - Scroll')
+pygame.display.set_caption('AEROPOSTA')
 ancho_ventana = 1000
 alto_ventana = 600
 ventana = pygame.display.set_mode((ancho_ventana, alto_ventana), 0, 32)
@@ -1499,7 +1417,6 @@ fuente_pequeña = pygame.font.SysFont("Airport.otf", 38)
 fuente_mas_pequeña = pygame.font.SysFont(None, 25)
 fuente_timer = pygame.font.SysFont('Consolas', 30)
 
-juegoSolitario = False
 juegoMultijugador = False
 
 # llevar el puntaje de cada jugador
@@ -1509,6 +1426,24 @@ puntaje_jugador_2 = 0
 # llevar cantidad de monedas de cada jugador
 monedas_jugador_1 = 0
 monedas_jugador_2 = 0
+'''
+# fondo transición trivia
+transicion_trivia = pygame.image.load("AvionAterrizaTrivia.png")
+transicion_triviaRect = transicion_trivia.get_rect()
+'''
+transicion_trivia = pygame.image.load("AvionAterrizaTrivia.png")
+imagentransicion_trivia = pygame.transform.scale(transicion_trivia, (1000, 600))
+transicion_triviaRect = imagentransicion_trivia.get_rect()
+
+#fondo transición carrera
+transicion_carrera = pygame.image.load("AvionDespegaCarrera.png")
+imagentransicion_carrera = pygame.transform.scale(transicion_carrera, (1000, 600))
+transicion_carreraRect = imagentransicion_carrera.get_rect()
+
+# establece los sonidos del juego
+#sonidoJuegoTerminado = pygame.mixer.Sound('game_over.ogg')
+sonidoSumaMoneda = pygame.mixer.Sound('moneda3.wav')
+musicaFondo = pygame.mixer.music.load('musicafondo1.wav')
 
 
 # --------------------###################-------------------------------------##############
@@ -1656,8 +1591,6 @@ preguntas = {
 fondo_preguntas = pygame.image.load("fondo-preguntas.png")
 fondo_preguntasRect = fondo_preguntas.get_rect()
 
-
-
 # estado de los jugadores
 esperando_respuesta_jugador = False
 esperando_respuesta_jugador2 = False
@@ -1671,12 +1604,12 @@ turno_en_curso = True
 fin_juego = False
 
 lista_preguntas_aeronauticas = []
-#print("corroborando lista de preguntas de aeronautica para este turno")
-#print(lista_preguntas_aeronauticas)
+# print("corroborando lista de preguntas de aeronautica para este turno")
+# print(lista_preguntas_aeronauticas)
 
 lista_preguntas_viajes = []
-#print("corroborando lista de preguntas de viajes para este turno")
-#print(lista_preguntas_viajes)
+# print("corroborando lista de preguntas de viajes para este turno")
+# print(lista_preguntas_viajes)
 
 # --------------------###################-------------------------------------##############
 
