@@ -195,6 +195,16 @@ def jugadorGolpeaMoneda(rectanguloJugador, monedas):
             return True
     return False
 
+def jugadorGolpeaNube(rectanguloJugador, nubes):
+    for nube in nubes:
+        if rectanguloJugador.colliderect(nube['rect']):
+            #cambia la imagen de la nube
+            ventana.blit(nube['superficie2'], nube['rect'])
+
+
+            return True
+    return False
+
 
 # --------------------###################-------------------------------------##############
 
@@ -218,7 +228,8 @@ def juego_scroll():
 
     # subir la imagen de fondo para el scroll
     fondo = pygame.image.load("scroll2.png").convert()
-    fondoRect = fondo.get_rect()
+
+    #fondoRect = fondo.get_rect()
     ancho, alto = ancho_ventana, alto_ventana
     posicion_en_x = 0
     posicion_en_y = 0
@@ -233,16 +244,25 @@ def juego_scroll():
     # este no es el bucle del juego
     corriendo = True
     while corriendo:
-
+        #monedas
         monedas = []
         cantidad_monedas_1 = 0
         cantidad_monedas_2 = 0
+
+        #obstaculos
+        #nubes
+        nubes = []
+        edificios = []
+
         # situo a los jugadores en la pantalla
         rectanguloJugador.topleft = (100, alto_ventana - 50)  # jugador 1 a la izquierda
         rectanguloJugador2.topleft = (ancho_ventana - 100, alto_ventana - 50)  # jugador 2 a la derecha
+
         moverIzquierda = moverDerecha = moverArriba = moverAbajo = False
         moverIzquierda2 = moverDerecha2 = moverArriba2 = moverAbajo2 = False
         contadorAgregarMoneda = 0
+        contadorAgregarNube = 0
+        contadorAgregarEdificio = 0
 
         # Detiene la musica
         pygame.mixer.music.stop()
@@ -336,6 +356,13 @@ def juego_scroll():
             if posicion_en_y1 > alto:
                 posicion_en_y1 = -alto
 
+            #dibujo la separacion de la ventana
+            if juegoMultijugador == True:
+                #ancho de las nubes 28 px
+                rectanguloNubesDivisoras.topleft = (ancho_ventana/2-14, 0)
+                ventana.blit(imagenNubesDivisoras, rectanguloNubesDivisoras)
+
+
             # Añade monedas en la parte superior de la pantalla
             contadorAgregarMoneda += 1
             if contadorAgregarMoneda >= tasa_nueva_moneda:
@@ -348,8 +375,8 @@ def juego_scroll():
                 monedas.append(nuevaMoneda)
 
             # Mueve las monedas hacia abajo.
-            for item in monedas:
-                item['rect'].move_ip(0, item['velocidad'])
+            for moneda in monedas:
+                moneda['rect'].move_ip(0, moneda['velocidad'])
 
             # Elimina los asteroides que han caido por debajo.
             # [:] develve una copia de la lista con todos sus ítems (del primero al último).
@@ -357,27 +384,71 @@ def juego_scroll():
             # perder la cuenta de cuál debería ser el próximo valor de la variable comida si el tamaño de la lista
             # asteroides está cambiando
 
-            for item in monedas[:]:
-                if item['rect'].top > alto_ventana:
-                    monedas.remove(item)
+            for moneda in monedas[:]:
+                if moneda['rect'].top > alto_ventana:
+                    monedas.remove(moneda)
 
             # Dibuja cada moneda
-            for v in monedas:
-                ventana.blit(v['superficie'], v['rect'])
+            for moneda in monedas:
+                ventana.blit(moneda['superficie'], moneda['rect'])
 
             # Verifica si alguna moneda impactó en el jugador.
 
             if jugadorGolpeaMoneda(rectanguloJugador, monedas):
-                cantidad_monedas_1 += 1  # incrementa el puntaje
+                cantidad_monedas_1 += 5  # incrementa el puntaje
                 sonidoSumaMoneda.play()
 
             if juegoMultijugador == True:
 
                 if jugadorGolpeaMoneda(rectanguloJugador2, monedas):
-                    cantidad_monedas_2 += 1  # incrementa el puntaje
+                    cantidad_monedas_2 += 5  # incrementa el puntaje
                     sonidoSumaMoneda.play()
 
+            # Añade nubes como obstaculos en la parte superior de la pantalla
+            contadorAgregarNube += 1
+
+            if contadorAgregarNube >= tasa_nueva_nube:
+                contadorAgregarNube = 0
+                tamañoNube = random.randint(tamaño_min_nube, tamaño_max_nube)
+                nuevaNube = {
+                    'rect': pygame.Rect(random.randint(0, ancho_ventana - tamañoNube), 0 - tamañoNube,
+                                        tamañoNube, tamañoNube),
+                    'velocidad': 2,  #debe coincidir con la velocidad del scroll
+                    'superficie': pygame.transform.scale(imagenNubeObstaculo, (tamañoNube, tamañoNube)),
+                    'superficie2': pygame.transform.scale(imagenNubeColision, (tamañoNube, tamañoNube))
+                    }
+                nubes.append(nuevaNube)
+
+            # Mueve las nubes hacia abajo.
+            for nube in nubes:
+                nube['rect'].move_ip(0, nube['velocidad'])
+
+            for nube in nubes[:]:
+                if nube['rect'].top > alto_ventana:
+                    nubes.remove(nube)
+
+            # Dibuja cada nube
+            for nube in nubes:
+                ventana.blit(nube['superficie'], nube['rect'])
+
+
+            # Verifica si alguna nube impactó en el jugador.
+
+            if jugadorGolpeaNube(rectanguloJugador, nubes):
+                cantidad_monedas_1 -= 1  # disminuye el puntaje
+                sonidoTrueno.play()
+
+            if juegoMultijugador == True:
+
+                if jugadorGolpeaNube(rectanguloJugador2, nubes):
+                    cantidad_monedas_2 -= 1  # disminuye el puntaje
+                    sonidoTrueno.play()
+
+
+
+
             # Mueve el avion del jugador 1.
+            #al ser hasta cero no deja que escape de la pantalla
             if moverIzquierda and rectanguloJugador.left > 0:
                 rectanguloJugador.move_ip(-1 * movimiento_jugador, 0)
             if moverDerecha and rectanguloJugador.right < ancho_ventana:
@@ -389,8 +460,19 @@ def juego_scroll():
 
             if juegoMultijugador == True:
 
+                # Mueve el avion del jugador 1.
+                # al ser hasta cero no deja que escape de la pantalla
+                if moverIzquierda and rectanguloJugador.left > 0:
+                    rectanguloJugador.move_ip(-1 * movimiento_jugador, 0)
+                if moverDerecha and rectanguloJugador.right < 486:  # ancho de pantalla sin contar las nubes divisorias
+                    rectanguloJugador.move_ip(movimiento_jugador, 0)
+                if moverArriba and rectanguloJugador.top > 0:
+                    rectanguloJugador.move_ip(0, -1 * movimiento_jugador)
+                if moverAbajo and rectanguloJugador.bottom < alto_ventana:
+                    rectanguloJugador.move_ip(0, movimiento_jugador)
+
                 # Mueve el avion del jugador 2.
-                if moverIzquierda2 and rectanguloJugador2.left > 0:
+                if moverIzquierda2 and rectanguloJugador2.left > 514: #ancho de pantalla contando las nubes divisorias
                     rectanguloJugador2.move_ip(-1 * movimiento_jugador, 0)
                 if moverDerecha2 and rectanguloJugador2.right < ancho_ventana:
                     rectanguloJugador2.move_ip(movimiento_jugador, 0)
@@ -416,6 +498,7 @@ def juego_scroll():
             pygame.display.update()
             reloj.tick(60)
 
+        #sumo las monedas al global del jugador
         monedas_jugador_1 += cantidad_monedas_1
         if juegoMultijugador == True:
             monedas_jugador_2 += cantidad_monedas_2
@@ -446,8 +529,8 @@ def juego_preguntas():
 
     if juegoMultijugador == True:
         dibujar_texto("Jugador 2: ", fuente_pequeña, negro, ventana, 800, 460)
-        dibujar_texto("Puntos: " + str(puntaje_jugador_1), fuente_pequeña, azul_marino, ventana, 800, 490)
-        dibujar_texto("Monedas: " + str(monedas_jugador_1), fuente_pequeña, azul_marino, ventana, 800, 520)
+        dibujar_texto("Puntos: " + str(puntaje_jugador_2), fuente_pequeña, azul_marino, ventana, 800, 490)
+        dibujar_texto("Monedas: " + str(monedas_jugador_2), fuente_pequeña, azul_marino, ventana, 800, 520)
 
 
     # Detiene el juego y muestra "Juego Terminado"
@@ -492,7 +575,7 @@ def juego_preguntas():
         # Detiene la musica
         pygame.mixer.music.stop()
         # cargar nueva cancion
-        pygame.mixer.music.load('musicaFondo5.wav')
+        pygame.mixer.music.load('musicaFondo5cortado.wav')
 
         # inicio la musica
         pygame.mixer.music.play(-1, 0.0)
@@ -1274,6 +1357,9 @@ def juego_preguntas():
         # inicio la musica
         pygame.mixer.music.play(-1, 0.0)
 
+        #sonido ganador
+        sonidoJuegoTerminado.play()
+
         fin_juego = True
         print("Fin del juego")
 
@@ -1398,6 +1484,7 @@ pygame.display.set_caption('AEROPOSTA')
 ancho_ventana = 1000
 alto_ventana = 600
 ventana = pygame.display.set_mode((ancho_ventana, alto_ventana), 0, 32)
+#oculto el mouse en la ventana
 pygame.mouse.set_visible(False)
 
 # colores
@@ -1423,26 +1510,24 @@ juegoMultijugador = False
 puntaje_jugador_1 = 0
 puntaje_jugador_2 = 0
 
-# llevar cantidad de monedas de cada jugador
 monedas_jugador_1 = 0
 monedas_jugador_2 = 0
-'''
-# fondo transición trivia
-transicion_trivia = pygame.image.load("AvionAterrizaTrivia.png")
-transicion_triviaRect = transicion_trivia.get_rect()
-'''
-transicion_trivia = pygame.image.load("AvionAterrizaTrivia.png")
+
+
+#fondo transición trivia
+transicion_trivia = pygame.image.load("AvionAterriza.png")
 imagentransicion_trivia = pygame.transform.scale(transicion_trivia, (1000, 600))
 transicion_triviaRect = imagentransicion_trivia.get_rect()
 
 #fondo transición carrera
-transicion_carrera = pygame.image.load("AvionDespegaCarrera.png")
+transicion_carrera = pygame.image.load("AvionDespega.png")
 imagentransicion_carrera = pygame.transform.scale(transicion_carrera, (1000, 600))
 transicion_carreraRect = imagentransicion_carrera.get_rect()
 
 # establece los sonidos del juego
-#sonidoJuegoTerminado = pygame.mixer.Sound('game_over.ogg')
+sonidoJuegoTerminado = pygame.mixer.Sound('aplausos.wav')
 sonidoSumaMoneda = pygame.mixer.Sound('moneda3.wav')
+sonidoTrueno = pygame.mixer.Sound('trueno1.wav')
 musicaFondo = pygame.mixer.music.load('musicafondo1.wav')
 
 
@@ -1450,13 +1535,29 @@ musicaFondo = pygame.mixer.music.load('musicafondo1.wav')
 
 # variables del juego de scroll
 
+#monedas
 tasa_nueva_moneda = 15
 velocidad_max_moneda = 8
 velocidad_min_moneda = 5
-movimiento_jugador = 5
 cantidad_monedas_1 = 0
 cantidad_monedas_2 = 0
-tiempo = 0
+
+#OBSTACULOS
+
+#nubes
+tasa_nueva_nube = 60
+tamaño_min_nube = 60
+tamaño_max_nube = 80
+
+#edificios
+tasa_nueva_edificio = 50
+tamaño_min_edificio = 60
+tamaño_max_edificio = 80
+
+
+#jugador
+movimiento_jugador = 5
+#tiempo = 0
 
 # establece las imagenes del jugador
 imagenJugador = pygame.image.load('avion1.png')
@@ -1465,6 +1566,24 @@ rectanguloJugador = pygame.Rect(0, 0, 65, 45)
 # segundo jugador
 imagenJugador2 = pygame.image.load('avion2.png')
 rectanguloJugador2 = pygame.Rect(0, 0, 65, 45)
+
+# establece las imagenes de las nubes divisoras de la pantalla
+imagenNubesDivisoras = pygame.image.load('NubesArrayArreglo.png')
+rectanguloNubesDivisoras = pygame.Rect(0, 0, 65, 45)
+
+
+# establece las imagenes de la nube (obstaculo)
+imagenNubeObstaculo = pygame.image.load('nubeObstaculo.png')
+rectanguloNubeObstaculo = pygame.Rect(0, 0, 65, 45)
+
+# establece las imagenes de la nube (obstaculo)
+imagenNubeColision = pygame.image.load('NubeObstaculo2.png')
+rectanguloNubeColision = pygame.Rect(0, 0, 65, 45)
+
+# establece las imagenes del edificio (obstaculo)
+imagenEdificioObstaculo = pygame.image.load('EdificioObstaculo.png')
+rectanguloEdificioObstaculo = pygame.Rect(0, 0, 65, 45)
+
 
 # establece las imagenes de los items/objetos
 supMoneda = pygame.image.load("moneda.png")
