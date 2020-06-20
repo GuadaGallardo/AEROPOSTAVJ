@@ -302,6 +302,29 @@ def comprobar_resp_jugador2():
             dibujar_texto("P", fuente, negro, ventana, (ancho_ventana - 50), 465)
             comprobar_respuesta2 = False
 
+def resp_correcta_jugador(numero_jugador, puntos_ganados, x, y):
+    global puntaje_jugador_1, puntaje_jugador_2
+    dibujar_texto("Correcto: sumas " + str(puntos_ganados) + " puntos", fuente_mas_pequena, verde_brillante, ventana, x, y)
+    pygame.display.update()
+    sonidoCorrecto.play()
+
+    if numero_jugador == 1:
+        puntaje_jugador_1 += puntos_ganados
+    elif numero_jugador == 2:
+        puntaje_jugador_2 += puntos_ganados
+
+
+def resp_incorrecta_jugador(numero_jugador, x, y):
+    global jugador1_acerto, jugador2_acerto
+    dibujar_texto("Incorrecto: no sumas puntos", fuente_mas_pequena, amarillo, ventana, x, y)
+
+    if numero_jugador == 1:
+        jugador1_acerto = False
+    elif numero_jugador == 2:
+        jugador2_acerto = False
+
+    pygame.display.update()
+    sonidoIncorrecto.play()
 
 # --------------------###################-------------------------------------##############
 # funciones del scroll
@@ -704,7 +727,7 @@ def juego_scroll():
 def juego_preguntas():
     global esperando_respuesta_jugador, esperando_respuesta_jugador2, indice_turno, mostrando_correcto_incorrecto, mostrando_correcto_incorrecto2, fin_juego, juegoMultijugador
     global monedas_jugador_1, monedas_jugador_2, puntaje_jugador_1, puntaje_jugador_2, lista_preguntas_aeronauticas, lista_preguntas_viajes, musica_sonando, respuesta_jugador1, respuesta_jugador2
-
+    global jugador1_acerto, jugador2_acerto
     # Muestra la pantalla inicial
     ventana.blit(imagentransicion_trivia, transicion_triviaRect)
 
@@ -857,52 +880,20 @@ def juego_preguntas():
 
                         # compara resultado de la resp del jugador 1 con la correcta
                         if resolver(preguntas, "aeronautica", num_de_pregunta_aeronautica, respuesta_jugador1) == True:
-                            print("respuesta correcta sumas 100")
+                            resp_correcta_jugador(1, 100, 20, 520)
 
-                            dibujar_texto("Correcto: sumas 100 puntos", fuente_mas_pequena, verde_brillante,
-                                          ventana, 20, 520)
-
-                            pygame.display.update()
-                            sonidoCorrecto.play()
-                            puntaje_jugador_1 += 100
-                            print("puntaje del jugador")
-                            print(puntaje_jugador_1)
 
                         else:
-                            print("respuesta incorrecta")
-                            dibujar_texto("Incorrecto: no sumas puntos", fuente_mas_pequena, amarillo, ventana, 20,
-                                          520)
-                            jugador1_acerto = False
-                            pygame.display.update()
-                            sonidoIncorrecto.play()
-                            print("puntaje del jugador")
-                            print(puntaje_jugador_1)
+                            resp_incorrecta_jugador(1, 20, 520)
 
                         # comprueba la respuesta del jugador 2 con la correcta
 
                         if resolver(preguntas, "aeronautica", num_de_pregunta_aeronautica, respuesta_jugador2) == True:
-                            print("respuesta correcta sumas 100")
-
-                            dibujar_texto("Correcto: sumas 100 puntos", fuente_mas_pequena, verde_brillante,
-                                          ventana, 600,
-                                          520)
-                            pygame.display.update()
-                            sonidoCorrecto.play()
-                            puntaje_jugador_2 += 100
-                            print("puntaje del jugador")
-                            print(puntaje_jugador_2)
+                            resp_correcta_jugador(2, 100, 600, 520)
 
 
                         else:
-                            print("respuesta incorrecta")
-                            dibujar_texto("Incorrecto: no sumas puntos", fuente_mas_pequena, amarillo, ventana, 600,
-                                          520)
-
-                            jugador2_acerto = False
-                            pygame.display.update()
-                            sonidoIncorrecto.play()
-                            print("puntaje del jugador 2")
-                            print(puntaje_jugador_2)
+                            resp_incorrecta_jugador(2, 620, 520)
                     else:
                         continue
 
@@ -936,13 +927,6 @@ def juego_preguntas():
                         if len(lista_preguntas_viajes) > indice_turno:
                             num_de_pregunta_viajes = lista_preguntas_viajes[indice_turno]
 
-                            print("esta es la lista viajes")
-                            print(lista_preguntas_viajes)
-                            print("numero de turno")
-                            print(indice_turno)
-                            print("esto imprime el num esta dentro de la lista en el indice del turno")
-                            print(num_de_pregunta_viajes)
-
                             # dibuja la pregunta y sus respuestas en la pantalla, y el turno de juego
                             dibujar_pregunta("viajes", num_de_pregunta_viajes, indice_turno)
                             pygame.display.update()
@@ -963,27 +947,10 @@ def juego_preguntas():
 
                             # compara resultado de la resp del jugador 1 con la correcta
                             if resolver(preguntas, "viajes", num_de_pregunta_viajes, respuesta_jugador1) == True:
-                                print("respuesta correcta sumas 50")
-
-                                dibujar_texto("Correcto: sumas 50 puntos", fuente_mas_pequena, verde_brillante,
-                                              ventana, 20, 520)
-
-                                pygame.display.update()
-
-                                puntaje_jugador_1 += 50
-                                sonidoCorrecto.play()
-                                print("puntaje del jugador")
-                                print(puntaje_jugador_1)
+                               resp_correcta_jugador(1, 50, 20, 520)
 
                             else:
-                                print("Respuesta incorrecta")
-                                dibujar_texto("Incorrecto: no sumas puntos", fuente_mas_pequena, amarillo,
-                                              ventana,
-                                              20, 520)
-                                pygame.display.update()
-                                sonidoIncorrecto.play()
-                                print("puntaje del jugador")
-                                print(puntaje_jugador_1)
+                                resp_incorrecta_jugador(1, 20, 520)
 
 
                         else:
@@ -1015,13 +982,6 @@ def juego_preguntas():
                         if len(lista_preguntas_viajes) > indice_turno:
                             num_de_pregunta_viajes = lista_preguntas_viajes[indice_turno]
 
-                            print("esta es la lista viajes")
-                            print(lista_preguntas_viajes)
-                            print("numero de turno")
-                            print(indice_turno)
-                            print("esto imprime el num esta dentro de la lista en el indice del turno")
-                            print(num_de_pregunta_viajes)
-
                             # dibuja la pregunta y sus respuestas en la pantalla, y el turno de juego
                             dibujar_pregunta("viajes", num_de_pregunta_viajes, indice_turno)
                             pygame.display.update()
@@ -1036,36 +996,18 @@ def juego_preguntas():
                             esperando_respuesta_jugador2 = False
 
 
-                        #if esperando_respuesta_jugador == False:  # or
+
                         if esperando_respuesta_jugador2 == False:
 
                             # comprueba la respuesta del jugador 2 con la correcta
 
                             if resolver(preguntas, "viajes", num_de_pregunta_viajes, respuesta_jugador2) == True:
-                                print("respuesta correcta sumas 50")
 
-                                dibujar_texto("Correcto: sumas 50 puntos", fuente_mas_pequena,
-                                              verde_brillante,
-                                              ventana, 600,
-                                              520)
-                                pygame.display.update()
-                                puntaje_jugador_2 += 50
-                                sonidoCorrecto.play()
-                                print("puntaje del jugador")
-                                print(puntaje_jugador_2)
+                                resp_correcta_jugador(2, 50, 620, 520)
 
 
                             else:
-                                print("respuesta incorrecta")
-                                dibujar_texto("Incorrecto: no sumas puntos", fuente_mas_pequena, amarillo,
-                                              ventana, 600,
-                                              520)
-
-
-                                pygame.display.update()
-                                sonidoIncorrecto.play()
-                                print("puntaje del jugador 2")
-                                print(puntaje_jugador_2)
+                                resp_incorrecta_jugador(2, 620, 520)
 
 
                         else:
@@ -1096,13 +1038,6 @@ def juego_preguntas():
 
                         if len(lista_preguntas_viajes) > indice_turno:
                             num_de_pregunta_viajes = lista_preguntas_viajes[indice_turno]
-
-                            print("esta es la lista viajes")
-                            print(lista_preguntas_viajes)
-                            print("numero de turno")
-                            print(indice_turno)
-                            print("esto imprime el num esta dentro de la lista en el indice del turno")
-                            print(num_de_pregunta_viajes)
 
                             # dibuja la pregunta y sus respuestas en la pantalla, y el turno de juego
                             dibujar_pregunta("viajes", num_de_pregunta_viajes, indice_turno)
@@ -1137,55 +1072,20 @@ def juego_preguntas():
 
                             # compara resultado de la resp del jugador 1 con la correcta
                             if resolver(preguntas, "viajes", num_de_pregunta_viajes, respuesta_jugador1) == True:
-                                print("respuesta correcta sumas 50")
+                                resp_correcta_jugador(1, 100, 20, 520)
 
-                                dibujar_texto("Correcto: sumas 50 puntos", fuente_mas_pequena, verde_brillante,
-                                              ventana, 20, 520)
-
-                                pygame.display.update()
-                                sonidoCorrecto.play()
-                                puntaje_jugador_1 += 50
-                                print("puntaje del jugador")
-                                print(puntaje_jugador_1)
 
                             else:
-                                print("Respuesta incorrecta")
-                                dibujar_texto("Incorrecto: no sumas puntos", fuente_mas_pequena, amarillo,
-                                              ventana,
-                                              20, 520)
-                                pygame.display.update()
-                                sonidoIncorrecto.play()
-                                print("puntaje del jugador")
-                                print(puntaje_jugador_1)
+                                resp_incorrecta_jugador(1, 20, 520)
 
 
                             # comprueba la respuesta del jugador 2 con la correcta
 
                             if resolver(preguntas, "viajes", num_de_pregunta_viajes, respuesta_jugador2) == True:
-                                print("respuesta correcta sumas 50")
-
-                                dibujar_texto("Correcto: sumas 50 puntos", fuente_mas_pequena,
-                                              verde_brillante,
-                                              ventana, 600,
-                                              520)
-                                pygame.display.update()
-                                sonidoCorrecto.play()
-                                puntaje_jugador_2 += 50
-                                print("puntaje del jugador")
-                                print(puntaje_jugador_2)
-
+                                resp_correcta_jugador(2, 50, 620, 520)
 
                             else:
-                                print("respuesta incorrecta")
-                                dibujar_texto("Incorrecto: no sumas puntos", fuente_mas_pequena, amarillo,
-                                              ventana, 600,
-                                              520)
-
-
-                                pygame.display.update()
-                                sonidoIncorrecto.play()
-                                print("puntaje del jugador 2")
-                                print(puntaje_jugador_2)
+                               resp_incorrecta_jugador(2,620, 520)
 
 
                         else:
@@ -1198,8 +1098,6 @@ def juego_preguntas():
 
                     # creo la condicion para saber si la respuesta es correcta o no
                     if esperando_respuesta_jugador == True:
-                        print("esperar resp jugador = ")
-                        print(esperando_respuesta_jugador)
 
                         comprobar_resp_jugador1()
                         pygame.display.update()
@@ -1207,28 +1105,14 @@ def juego_preguntas():
 
                         # compara resultado de la resp del jugador 1 con la correcta
                         if resolver(preguntas, "aeronautica", num_de_pregunta_aeronautica, respuesta_jugador1) == True:
-                            print("respuesta correcta sumas 100")
 
-                            dibujar_texto("Correcto: sumas 100 puntos", fuente_mas_pequena, verde_brillante,
-                                          ventana, 20, 520)
-
-                            pygame.display.update()
-                            sonidoCorrecto.play()
-                            puntaje_jugador_1 += 100
-                            print("puntaje del jugador")
-                            print(puntaje_jugador_1)
+                            resp_correcta_jugador(1, 100, 20, 520)
 
                         else:
-                            print("respuesta incorrecta")
-                            dibujar_texto("Incorrecto: no sumas puntos", fuente_mas_pequena, amarillo, ventana, 20, 520)
-                            dibujar_texto("Presiona S para jugar por 50 puntos", fuente_mas_pequena, negro,
-                                          ventana, 20, 550)
 
-                            pygame.display.update()
-                            sonidoIncorrecto.play()
-                            jugador1_acerto = False
-                            print("puntaje del jugador")
-                            print(puntaje_jugador_1)
+                            dibujar_texto("Presiona S para jugar por 50 puntos", fuente_mas_pequena, negro, ventana, 20, 550)
+                            resp_incorrecta_jugador(1, 20, 520)
+
 
                     if jugador1_acerto == False:
                         ventana.blit(fondo_preguntas, fondo_preguntasRect)
@@ -1247,13 +1131,6 @@ def juego_preguntas():
                         if len(lista_preguntas_viajes) > indice_turno:
                             num_de_pregunta_viajes = lista_preguntas_viajes[indice_turno]
 
-                            print("esta es la lista aeronautica")
-                            print(lista_preguntas_viajes)
-                            print("numero de turno")
-                            print(indice_turno)
-                            print("esto imprime el num esta dentro de la lista en el indice del turno")
-                            print(num_de_pregunta_viajes)
-
                             # dibuja la pregunta y sus respuestas en la pantalla, y el turno de juego
                             dibujar_pregunta("viajes", num_de_pregunta_viajes, indice_turno)
                             pygame.display.update()
@@ -1265,29 +1142,15 @@ def juego_preguntas():
                             if esperando_respuesta_jugador == True:
                                 comprobar_resp_jugador1()
                                 pygame.display.update()
+
                                 esperando_respuesta_jugador = False
 
                                 # compara resultado de la resp del jugador 1 con la correcta
                                 if resolver(preguntas, "viajes", num_de_pregunta_viajes, respuesta_jugador1) == True:
-                                    print("respuesta correcta sumas 50")
-
-                                    dibujar_texto("Correcto: sumas 50 puntos", fuente_mas_pequena, verde_brillante,
-                                                  ventana, 20, 520)
-
-                                    pygame.display.update()
-                                    sonidoCorrecto.play()
-                                    puntaje_jugador_1 += 50
-                                    print("puntaje del jugador")
-                                    print(puntaje_jugador_1)
+                                    resp_correcta_jugador(1, 50, 20, 520)
 
                                 else:
-                                    print("Respuesta incorrecta")
-                                    dibujar_texto("Incorrecto: no sumas puntos", fuente_mas_pequena, amarillo, ventana,
-                                                  20, 520)
-                                    pygame.display.update()
-                                    sonidoIncorrecto.play()
-                                    print("puntaje del jugador")
-                                    print(puntaje_jugador_1)
+                                    resp_incorrecta_jugador(1, 20, 520)
 
                 # vuelvo al estado inicial la bandera
                 jugador1_acerto = True
@@ -1711,6 +1574,9 @@ esperando_respuesta_jugador2 = False
 
 # turno de juego (va a mostrar el numero de indice de la lista de preguntas que ya seleccionamos)
 indice_turno = 0
+
+jugador1_acerto = True
+jugador2_acerto = True
 
 mostrando_correcto_incorrecto = False
 mostrando_correcto_incorrecto2 = False
