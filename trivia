@@ -33,10 +33,20 @@ def dibujar_boton(texto, color_texto, x, y, ancho, alto, color_activo, color_ina
 
 
 # crear una funcion que dibuje texto en pantalla
+def dibujar_texto_centrado(texto, fuente, color, superficie, x, y):
+    texto_objeto = fuente.render(texto, 1, color)
+    texto_rect = texto_objeto.get_rect()
+    texto_rect.center = (x, y)
+    superficie.blit(texto_objeto, texto_rect)
+    return texto_rect
+
+
+# crear una funcion que dibuje texto en pantalla
 def dibujar_texto(texto, fuente, color, superficie, x, y):
     texto_objeto = fuente.render(texto, 1, color)
     texto_rect = texto_objeto.get_rect()
     texto_rect.topleft = (x, y)
+
     superficie.blit(texto_objeto, texto_rect)
     return texto_rect
 
@@ -175,30 +185,122 @@ def crear_lista_preguntas_cuestionario(diccionario, categoria):
 
 
 def resolver(diccionario, categoria, pregunta, respuesta):
-    if preguntas[categoria][pregunta]["correcta"] == respuesta:
+    if diccionario[categoria][pregunta]["correcta"] == respuesta:
         return True
     else:
         return False
 
-
 def dibujar_pregunta(categoria, pregunta_id, turno):
-    ancho_boton_respuesta = 40
+
+    #evaluo que tan larga es la pregunta
+    pregunta = preguntas[categoria][pregunta_id]["pregunta"]
+    print(type(pregunta))
+    print(len(pregunta))
+
+    pregunta_lista = pregunta.split()
+    print(pregunta_lista)
+
+    preg_primera_parte = []
+    preg_segunda_parte = []
+
+    for palabra in pregunta_lista:
+        if len(preg_primera_parte) < 8:
+            preg_primera_parte.append(palabra)
+        else:
+            preg_segunda_parte.append(palabra)
+
+    str_preg_primera_parte = " ".join(preg_primera_parte)
+    str_preg_segunda_parte = " ".join(preg_segunda_parte)
+
+    print(str_preg_primera_parte)
+    print(str_preg_segunda_parte)
+
 
     # dibujo la pregunta en la pantalla
-    dibujar_texto(preguntas[categoria][pregunta_id]["pregunta"], fuente_mas_pequena, (255, 255, 255), ventana, 20, 150)
+    if len(pregunta) < 70:
+        dibujar_texto_centrado(pregunta, fuente_pequena, (255, 255, 255), ventana, 500, 150)
+    else:
+        dibujar_texto_centrado(str_preg_primera_parte, fuente_pequena, (255, 255, 255), ventana, 500, 150)
+        dibujar_texto_centrado(str_preg_segunda_parte, fuente_pequena, (255, 255, 255), ventana, 500, 190)
 
     # respuesta
-    dibujar_texto(preguntas[categoria][pregunta_id]["opciones"][0], fuente_mas_pequena, (0, 0, 0), ventana,
-                  100, 275)
-    dibujar_texto(preguntas[categoria][pregunta_id]["opciones"][1], fuente_mas_pequena, (0, 0, 0), ventana,
-                  100, 340)
-    dibujar_texto(preguntas[categoria][pregunta_id]["opciones"][2], fuente_mas_pequena, (0, 0, 0), ventana,
-                  100, 405)
-    dibujar_texto(preguntas[categoria][pregunta_id]["opciones"][3], fuente_mas_pequena, (0, 0, 0), ventana,
-                  100, 470)
+    opcion_1 = preguntas[categoria][pregunta_id]["opciones"][0]
+
+
+    dibujar_texto_centrado(opcion_1, fuente_pequena, (0, 0, 0), ventana,500, 285)
+    #dibujar_texto(preguntas[categoria][pregunta_id]["opciones"][0], fuente_pequena, (0, 0, 0), ventana,100, 275)
+    print(len(preguntas[categoria][pregunta_id]["opciones"][0]))
+    dibujar_texto_centrado(preguntas[categoria][pregunta_id]["opciones"][1], fuente_pequena, (0, 0, 0), ventana,
+                  500, 350)
+    dibujar_texto_centrado(preguntas[categoria][pregunta_id]["opciones"][2], fuente_pequena, (0, 0, 0), ventana,
+                  500, 415)
+    dibujar_texto_centrado(preguntas[categoria][pregunta_id]["opciones"][3], fuente_pequena, (0, 0, 0), ventana,
+                  500, 480)
 
     # dibuja
     dibujar_texto("Toca la letra correspondiente a tu respuesta", fuente_mas_pequena, azul_marino, ventana, 320, 570)
+
+def dibujar_letras_jugador1():
+    # dibuja las letras sobre los botones
+    dibujar_texto("Q", fuente, azul_marino, ventana, 30, 270)
+    dibujar_texto("W", fuente, azul_marino, ventana, 30, 335)
+    dibujar_texto("E", fuente, azul_marino, ventana, 30, 400)
+    dibujar_texto("R", fuente, azul_marino, ventana, 30, 465)
+
+def dibujar_letras_jugador2():
+    # dibuja las letras sobre los botones
+    dibujar_texto("U", fuente, azul_marino, ventana, (ancho_ventana - 50), 270)
+    dibujar_texto("I", fuente, azul_marino, ventana, (ancho_ventana - 50), 335)
+    dibujar_texto("O", fuente, azul_marino, ventana, (ancho_ventana - 50), 400)
+    dibujar_texto("P", fuente, azul_marino, ventana, (ancho_ventana - 50), 465)
+
+def comprobar_resp_jugador1():
+    global respuesta_jugador1
+    comprobar_respuesta = True
+    while comprobar_respuesta:
+
+        # el jugador presiona una tecla
+        respuesta_jugador1 = esperar_jugador()
+        print(respuesta_jugador1)
+
+        if respuesta_jugador1 == 0:
+            dibujar_texto("Q", fuente, negro, ventana, 30, 270)
+            comprobar_respuesta = False
+        elif respuesta_jugador1 == 1:
+            dibujar_texto("W", fuente, negro, ventana, 30, 335)
+            comprobar_respuesta = False
+        elif respuesta_jugador1 == 2:
+            dibujar_texto("E", fuente, negro, ventana, 30, 400)
+            comprobar_respuesta = False
+        elif respuesta_jugador1 == 3:
+            dibujar_texto("R", fuente, negro, ventana, 30, 465)
+            comprobar_respuesta = False
+
+def comprobar_resp_jugador2():
+    global respuesta_jugador2
+    comprobar_respuesta2 = True
+    while comprobar_respuesta2:
+
+        # el jugador  2 presiona una tecla
+        respuesta_jugador2 = esperar_jugador()
+        print(respuesta_jugador2)
+
+        if respuesta_jugador2 == 11:
+            respuesta_jugador2 = 0
+            dibujar_texto("U", fuente, negro, ventana, (ancho_ventana - 50), 270)
+            comprobar_respuesta2 = False
+        elif respuesta_jugador2 == 12:
+            respuesta_jugador2 = 1
+            dibujar_texto("I", fuente, negro, ventana, (ancho_ventana - 50), 335)
+            comprobar_respuesta2 = False
+        elif respuesta_jugador2 == 13:
+            respuesta_jugador2 = 2
+            dibujar_texto("O", fuente, negro, ventana, (ancho_ventana - 50), 400)
+            comprobar_respuesta2 = False
+        elif respuesta_jugador2 == 14:
+            respuesta_jugador2 = 3
+            dibujar_texto("P", fuente, negro, ventana, (ancho_ventana - 50), 465)
+            comprobar_respuesta2 = False
 
 
 # --------------------###################-------------------------------------##############
@@ -229,13 +331,25 @@ def jugadorGolpeaEdificio(rectanguloJugador, edificios):
 # --------------------###################-------------------------------------##############
 
 def juego_scroll():
-    global juegoMultijugador, monedas_jugador_1, monedas_jugador_2, musica_sonando
+    global juegoMultijugador, monedas_jugador_1, monedas_jugador_2, musica_sonando, indice_turno
+
+    if indice_turno == 0:
+        if juegoMultijugador == True:
+            ventana.blit(indicacion_controles_solitario, (0, 0))
+            dibujar_texto('Presiona una tecla para comenzar', fuente_mas_pequena, negro, ventana, 355, 580)
+            pygame.display.update()
+            esperar_jugador()
+        else:
+            ventana.blit(indicacion_controles_solitario, (0, 0))
+            dibujar_texto('Presiona una tecla para comenzar', fuente_mas_pequena, negro, ventana, 355, 580)
+            pygame.display.update()
+            esperar_jugador()
 
     # Muestra la pantalla inicial
     ventana.blit(imagentransicion_carrera, transicion_carreraRect)
     dibujar_texto('Despegando al próximo aeropuerto...', fuente, negro, ventana, 230, 10)
     dibujar_texto('Las monedas que consigas se suman a tus puntos', fuente_pequena, azul_marino, ventana, 210, 50)
-    dibujar_texto('Presiona una tecla para comenzar', fuente_mas_pequena, negro, ventana, 355, 580)
+    dibujar_texto('Presiona una tecla para avanzar', fuente_mas_pequena, negro, ventana, 355, 580)
     # Detiene la musica
     pygame.mixer.music.stop()
     #cargar nueva cancion
@@ -589,7 +703,7 @@ def juego_scroll():
 
 def juego_preguntas():
     global esperando_respuesta_jugador, esperando_respuesta_jugador2, indice_turno, mostrando_correcto_incorrecto, mostrando_correcto_incorrecto2, fin_juego, juegoMultijugador
-    global monedas_jugador_1, monedas_jugador_2, puntaje_jugador_1, puntaje_jugador_2, lista_preguntas_aeronauticas, lista_preguntas_viajes, musica_sonando
+    global monedas_jugador_1, monedas_jugador_2, puntaje_jugador_1, puntaje_jugador_2, lista_preguntas_aeronauticas, lista_preguntas_viajes, musica_sonando, respuesta_jugador1, respuesta_jugador2
 
     # Muestra la pantalla inicial
     ventana.blit(imagentransicion_trivia, transicion_triviaRect)
@@ -685,17 +799,11 @@ def juego_preguntas():
                         pausa_despausa_la_musica()
 
             # dibuja las letras sobre los botones
-            dibujar_texto("Q", fuente, azul_marino, ventana, 30, 270)
-            dibujar_texto("W", fuente, azul_marino, ventana, 30, 335)
-            dibujar_texto("E", fuente, azul_marino, ventana, 30, 400)
-            dibujar_texto("R", fuente, azul_marino, ventana, 30, 465)
+            dibujar_letras_jugador1()
 
             if juegoMultijugador == True:
                 # dibuja las letras sobre los botones
-                dibujar_texto("U", fuente, azul_marino, ventana, (ancho_ventana - 50), 270)
-                dibujar_texto("I", fuente, azul_marino, ventana, (ancho_ventana - 50), 335)
-                dibujar_texto("O", fuente, azul_marino, ventana, (ancho_ventana - 50), 400)
-                dibujar_texto("P", fuente, azul_marino, ventana, (ancho_ventana - 50), 465)
+                dibujar_letras_jugador2()
 
             print("fin del juego es : ")
             print(fin_juego)
@@ -714,13 +822,6 @@ def juego_preguntas():
                 # si el turno es 0, se accede a la lista en ese indice
                 if len(lista_preguntas_aeronauticas) > indice_turno:
                     num_de_pregunta_aeronautica = lista_preguntas_aeronauticas[indice_turno]
-
-                    print("esta es la lista aeronautica")
-                    print(lista_preguntas_aeronauticas)
-                    print("numero de turno")
-                    print(indice_turno)
-                    print("esto imprime el num esta dentro de la lista en el indice del turno")
-                    print(num_de_pregunta_aeronautica)
 
                     # dibuja la pregunta y sus respuestas en la pantalla, y el turno de juego
                     dibujar_pregunta("aeronautica", num_de_pregunta_aeronautica, indice_turno)
@@ -741,70 +842,14 @@ def juego_preguntas():
 
                     # creo la condicion para saber si la respuesta es correcta o no
                     if esperando_respuesta_jugador == True:
-                        print("esperar resp jugador = ")
-                        print(esperando_respuesta_jugador)
-
-                        comprobar_respuesta = True
-                        while comprobar_respuesta:
-
-                            # el jugador presiona una tecla
-                            respuesta_jugador1 = esperar_jugador()
-                            print(respuesta_jugador1)
-
-                            if respuesta_jugador1 == 0:
-                                dibujar_texto("Q", fuente, negro, ventana, 30, 270)
-                                comprobar_respuesta = False
-                            elif respuesta_jugador1 == 1:
-                                dibujar_texto("W", fuente, negro, ventana, 30, 335)
-                                comprobar_respuesta = False
-                            elif respuesta_jugador1 == 2:
-                                dibujar_texto("E", fuente, negro, ventana, 30, 400)
-                                comprobar_respuesta = False
-                            elif respuesta_jugador1 == 3:
-                                dibujar_texto("R", fuente, negro, ventana, 30, 465)
-                                comprobar_respuesta = False
-
-                        print("el o los jugadores ya pulso una tecla - esperar resp jugador = ")
-                        print(esperando_respuesta_jugador)
-                        print("Compara la resp del jugador con la respuesta correcta")
-                        print(resolver(preguntas, "aeronautica", num_de_pregunta_aeronautica, respuesta_jugador1))
+                        comprobar_resp_jugador1()
                         pygame.display.update()
                         esperando_respuesta_jugador = False
 
                     # creo la condicion para saber si la respuesta es correcta o no
                     if esperando_respuesta_jugador2 == True:
-                        print("esperar resp jugador 2 = ")
-                        print(esperando_respuesta_jugador2)
 
-                        comprobar_respuesta2 = True
-                        while comprobar_respuesta2:
-
-                            # el jugador  2 presiona una tecla
-                            respuesta_jugador2 = esperar_jugador()
-                            print(respuesta_jugador2)
-
-                            if respuesta_jugador2 == 11:
-                                respuesta_jugador2 = 0
-                                dibujar_texto("U", fuente, negro, ventana, (ancho_ventana - 50), 270)
-                                comprobar_respuesta2 = False
-                            elif respuesta_jugador2 == 12:
-                                respuesta_jugador2 = 1
-                                dibujar_texto("I", fuente, negro, ventana, (ancho_ventana - 50), 335)
-                                comprobar_respuesta2 = False
-                            elif respuesta_jugador2 == 13:
-                                respuesta_jugador2 = 2
-                                dibujar_texto("O", fuente, negro, ventana, (ancho_ventana - 50), 400)
-                                comprobar_respuesta2 = False
-                            elif respuesta_jugador2 == 14:
-                                respuesta_jugador2 = 3
-                                dibujar_texto("P", fuente, negro, ventana, (ancho_ventana - 50), 465)
-                                comprobar_respuesta2 = False
-
-                        print("el o los jugadores ya pulso una tecla - esperar resp jugador = ")
-                        print(esperando_respuesta_jugador2)
-                        print("Compara la resp del jugador 2 con la respuesta correcta")
-                        print(resolver(preguntas, "aeronautica", num_de_pregunta_aeronautica, respuesta_jugador2))
-
+                        comprobar_resp_jugador2()
                         pygame.display.update()
                         esperando_respuesta_jugador2 = False
 
@@ -868,21 +913,17 @@ def juego_preguntas():
                     if jugador1_acerto == False and jugador2_acerto == True:
 
                         ventana.blit(fondo_preguntas, fondo_preguntasRect)
+
                         # dibuja las letras sobre los botones
-                        dibujar_texto("Entro en la condicion de ambos jugadores erraron", fuente, azul_marino,
-                                      ventana, 30, 270)
-                        dibujar_texto("W", fuente, azul_marino, ventana, 30, 335)
-                        dibujar_texto("E", fuente, azul_marino, ventana, 30, 400)
-                        dibujar_texto("R", fuente, azul_marino, ventana, 30, 465)
+                        dibujar_letras_jugador1()
                         dibujar_texto("Puntaje Total: " + str(puntaje_jugador_1), fuente_pequena, azul_marino,
                                       ventana,
                                       20, 570)
 
                         # dibuja las letras sobre los botones
-                        dibujar_texto("U", fuente, azul_marino, ventana, (ancho_ventana - 50), 270)
-                        dibujar_texto("I", fuente, azul_marino, ventana, (ancho_ventana - 50), 335)
-                        dibujar_texto("O", fuente, azul_marino, ventana, (ancho_ventana - 50), 400)
-                        dibujar_texto("P", fuente, azul_marino, ventana, (ancho_ventana - 50), 465)
+                        dibujar_letras_jugador2()
+                        dibujar_texto("Puntaje Total: " + str(puntaje_jugador_2), fuente_pequena, azul_marino,
+                                      ventana, 850, 570)
 
                         responder_viajes = True
                         while responder_viajes:
@@ -911,32 +952,8 @@ def juego_preguntas():
 
                         # creo la condicion para saber si la respuesta es correcta o no
                         if esperando_respuesta_jugador == True:
+                            comprobar_resp_jugador1()
 
-                            comprobar_respuesta = True
-                            while comprobar_respuesta:
-
-                                # el jugador presiona una tecla
-                                respuesta_jugador1 = esperar_jugador()
-                                print(respuesta_jugador1)
-
-                                if respuesta_jugador1 == 0:
-                                    dibujar_texto("Q", fuente, negro, ventana, 30, 270)
-                                    comprobar_respuesta = False
-                                elif respuesta_jugador1 == 1:
-                                    dibujar_texto("W", fuente, negro, ventana, 30, 335)
-                                    comprobar_respuesta = False
-                                elif respuesta_jugador1 == 2:
-                                    dibujar_texto("E", fuente, negro, ventana, 30, 400)
-                                    comprobar_respuesta = False
-                                elif respuesta_jugador1 == 3:
-                                    dibujar_texto("R", fuente, negro, ventana, 30, 465)
-                                    comprobar_respuesta = False
-
-                            print("el o los jugadores ya pulso una tecla - esperar resp jugador = ")
-                            print(esperando_respuesta_jugador)
-                            print("Compara la resp del jugador con la respuesta correcta")
-                            print(
-                                resolver(preguntas, "viajes", num_de_pregunta_viajes, respuesta_jugador1))
                             pygame.display.update()
                             esperando_respuesta_jugador = False
                         else:
@@ -977,20 +994,15 @@ def juego_preguntas():
 
                         ventana.blit(fondo_preguntas, fondo_preguntasRect)
                         # dibuja las letras sobre los botones
-                        dibujar_texto("Entro en la condicion de ambos jugadores erraron", fuente, azul_marino,
-                                      ventana, 30, 270)
-                        dibujar_texto("W", fuente, azul_marino, ventana, 30, 335)
-                        dibujar_texto("E", fuente, azul_marino, ventana, 30, 400)
-                        dibujar_texto("R", fuente, azul_marino, ventana, 30, 465)
+                        dibujar_letras_jugador1()
                         dibujar_texto("Puntaje Total: " + str(puntaje_jugador_1), fuente_pequena, azul_marino,
                                       ventana,
                                       20, 570)
 
                         # dibuja las letras sobre los botones
-                        dibujar_texto("U", fuente, azul_marino, ventana, (ancho_ventana - 50), 270)
-                        dibujar_texto("I", fuente, azul_marino, ventana, (ancho_ventana - 50), 335)
-                        dibujar_texto("O", fuente, azul_marino, ventana, (ancho_ventana - 50), 400)
-                        dibujar_texto("P", fuente, azul_marino, ventana, (ancho_ventana - 50), 465)
+                        dibujar_letras_jugador2()
+                        dibujar_texto("Puntaje Total: " + str(puntaje_jugador_2), fuente_pequena, azul_marino,
+                                      ventana, 850, 570)
 
                         responder_viajes = True
                         while responder_viajes:
@@ -1018,36 +1030,7 @@ def juego_preguntas():
                         esperando_respuesta_jugador2 = True
                         # creo la condicion para saber si la respuesta es correcta o no
                         if esperando_respuesta_jugador2 == True:
-
-                            comprobar_respuesta2 = True
-                            while comprobar_respuesta2:
-
-                                # el jugador  2 presiona una tecla
-                                respuesta_jugador2 = esperar_jugador()
-                                print(respuesta_jugador2)
-
-                                if respuesta_jugador2 == 11:
-                                    respuesta_jugador2 = 0
-                                    dibujar_texto("U", fuente, negro, ventana, (ancho_ventana - 50), 270)
-                                    comprobar_respuesta2 = False
-                                elif respuesta_jugador2 == 12:
-                                    respuesta_jugador2 = 1
-                                    dibujar_texto("I", fuente, negro, ventana, (ancho_ventana - 50), 335)
-                                    comprobar_respuesta2 = False
-                                elif respuesta_jugador2 == 13:
-                                    respuesta_jugador2 = 2
-                                    dibujar_texto("O", fuente, negro, ventana, (ancho_ventana - 50), 400)
-                                    comprobar_respuesta2 = False
-                                elif respuesta_jugador2 == 14:
-                                    respuesta_jugador2 = 3
-                                    dibujar_texto("P", fuente, negro, ventana, (ancho_ventana - 50), 465)
-                                    comprobar_respuesta2 = False
-
-                            print("el o los jugadores ya pulso una tecla - esperar resp jugador = ")
-                            print(esperando_respuesta_jugador2)
-                            print("Compara la resp del jugador 2 con la respuesta correcta")
-                            print(resolver(preguntas, "viajes", num_de_pregunta_viajes,
-                                           respuesta_jugador2))
+                            comprobar_resp_jugador2()
 
                             pygame.display.update()
                             esperando_respuesta_jugador2 = False
@@ -1093,20 +1076,15 @@ def juego_preguntas():
 
                         ventana.blit(fondo_preguntas, fondo_preguntasRect)
                         # dibuja las letras sobre los botones
-                        dibujar_texto("Entro en la condicion de ambos jugadores erraron", fuente, azul_marino,
-                                      ventana, 30, 270)
-                        dibujar_texto("W", fuente, azul_marino, ventana, 30, 335)
-                        dibujar_texto("E", fuente, azul_marino, ventana, 30, 400)
-                        dibujar_texto("R", fuente, azul_marino, ventana, 30, 465)
+                        dibujar_letras_jugador1()
                         dibujar_texto("Puntaje Total: " + str(puntaje_jugador_1), fuente_pequena, azul_marino,
                                       ventana,
                                       20, 570)
 
                         # dibuja las letras sobre los botones
-                        dibujar_texto("U", fuente, azul_marino, ventana, (ancho_ventana - 50), 270)
-                        dibujar_texto("I", fuente, azul_marino, ventana, (ancho_ventana - 50), 335)
-                        dibujar_texto("O", fuente, azul_marino, ventana, (ancho_ventana - 50), 400)
-                        dibujar_texto("P", fuente, azul_marino, ventana, (ancho_ventana - 50), 465)
+                        dibujar_letras_jugador2()
+                        dibujar_texto("Puntaje Total: " + str(puntaje_jugador_2), fuente_pequena, azul_marino,
+                                      ventana, 850, 570)
 
                         responder_viajes = True
                         while responder_viajes:
@@ -1136,32 +1114,8 @@ def juego_preguntas():
 
                         # creo la condicion para saber si la respuesta es correcta o no
                         if esperando_respuesta_jugador == True:
+                            comprobar_resp_jugador1()
 
-                            comprobar_respuesta = True
-                            while comprobar_respuesta:
-
-                                # el jugador presiona una tecla
-                                respuesta_jugador1 = esperar_jugador()
-                                print(respuesta_jugador1)
-
-                                if respuesta_jugador1 == 0:
-                                    dibujar_texto("Q", fuente, negro, ventana, 30, 270)
-                                    comprobar_respuesta = False
-                                elif respuesta_jugador1 == 1:
-                                    dibujar_texto("W", fuente, negro, ventana, 30, 335)
-                                    comprobar_respuesta = False
-                                elif respuesta_jugador1 == 2:
-                                    dibujar_texto("E", fuente, negro, ventana, 30, 400)
-                                    comprobar_respuesta = False
-                                elif respuesta_jugador1 == 3:
-                                    dibujar_texto("R", fuente, negro, ventana, 30, 465)
-                                    comprobar_respuesta = False
-
-                            print("el o los jugadores ya pulso una tecla - esperar resp jugador = ")
-                            print(esperando_respuesta_jugador)
-                            print("Compara la resp del jugador con la respuesta correcta")
-                            print(
-                                resolver(preguntas, "viajes", num_de_pregunta_viajes, respuesta_jugador1))
                             pygame.display.update()
                             esperando_respuesta_jugador = False
                         else:
@@ -1172,36 +1126,7 @@ def juego_preguntas():
                         # creo la condicion para saber si la respuesta es correcta o no
                         if esperando_respuesta_jugador2 == True:
 
-                            comprobar_respuesta2 = True
-                            while comprobar_respuesta2:
-
-                                # el jugador  2 presiona una tecla
-                                respuesta_jugador2 = esperar_jugador()
-                                print(respuesta_jugador2)
-
-                                if respuesta_jugador2 == 11:
-                                    respuesta_jugador2 = 0
-                                    dibujar_texto("U", fuente, negro, ventana, (ancho_ventana - 50), 270)
-                                    comprobar_respuesta2 = False
-                                elif respuesta_jugador2 == 12:
-                                    respuesta_jugador2 = 1
-                                    dibujar_texto("I", fuente, negro, ventana, (ancho_ventana - 50), 335)
-                                    comprobar_respuesta2 = False
-                                elif respuesta_jugador2 == 13:
-                                    respuesta_jugador2 = 2
-                                    dibujar_texto("O", fuente, negro, ventana, (ancho_ventana - 50), 400)
-                                    comprobar_respuesta2 = False
-                                elif respuesta_jugador2 == 14:
-                                    respuesta_jugador2 = 3
-                                    dibujar_texto("P", fuente, negro, ventana, (ancho_ventana - 50), 465)
-                                    comprobar_respuesta2 = False
-
-                            print("el o los jugadores ya pulso una tecla - esperar resp jugador = ")
-                            print(esperando_respuesta_jugador2)
-                            print("Compara la resp del jugador 2 con la respuesta correcta")
-                            print(resolver(preguntas, "viajes", num_de_pregunta_viajes,
-                                           respuesta_jugador2))
-
+                            comprobar_resp_jugador2()
                             pygame.display.update()
                             esperando_respuesta_jugador2 = False
 
@@ -1276,30 +1201,7 @@ def juego_preguntas():
                         print("esperar resp jugador = ")
                         print(esperando_respuesta_jugador)
 
-                        comprobar_respuesta = True
-                        while comprobar_respuesta:
-
-                            # el jugador presiona una tecla
-                            respuesta_jugador1 = esperar_jugador()
-                            print(respuesta_jugador1)
-
-                            if respuesta_jugador1 == 0:
-                                dibujar_texto("Q", fuente, negro, ventana, 30, 270)
-                                comprobar_respuesta = False
-                            elif respuesta_jugador1 == 1:
-                                dibujar_texto("W", fuente, negro, ventana, 30, 335)
-                                comprobar_respuesta = False
-                            elif respuesta_jugador1 == 2:
-                                dibujar_texto("E", fuente, negro, ventana, 30, 400)
-                                comprobar_respuesta = False
-                            elif respuesta_jugador1 == 3:
-                                dibujar_texto("R", fuente, negro, ventana, 30, 465)
-                                comprobar_respuesta = False
-
-                        print("el o los jugadores ya pulso una tecla - esperar resp jugador = ")
-                        print(esperando_respuesta_jugador)
-                        print("Compara la resp del jugador con la respuesta correcta")
-                        print(resolver(preguntas, "aeronautica", num_de_pregunta_aeronautica, respuesta_jugador1))
+                        comprobar_resp_jugador1()
                         pygame.display.update()
                         esperando_respuesta_jugador = False
 
@@ -1331,10 +1233,7 @@ def juego_preguntas():
                     if jugador1_acerto == False:
                         ventana.blit(fondo_preguntas, fondo_preguntasRect)
                         # dibuja las letras sobre los botones
-                        dibujar_texto("Q", fuente, azul_marino, ventana, 30, 270)
-                        dibujar_texto("W", fuente, azul_marino, ventana, 30, 335)
-                        dibujar_texto("E", fuente, azul_marino, ventana, 30, 400)
-                        dibujar_texto("R", fuente, azul_marino, ventana, 30, 465)
+                        dibujar_letras_jugador1()
                         dibujar_texto("Puntaje Total: " + str(puntaje_jugador_1), fuente_pequena, azul_marino, ventana,
                                       20, 570)
                         responder_viajes = True
@@ -1364,34 +1263,7 @@ def juego_preguntas():
 
                             # creo la condicion para saber si la respuesta es correcta o no
                             if esperando_respuesta_jugador == True:
-                                print("esperar resp jugador = ")
-                                print(esperando_respuesta_jugador)
-
-                                comprobar_respuesta = True
-                                while comprobar_respuesta:
-
-                                    # el jugador presiona una tecla
-                                    respuesta_jugador1 = esperar_jugador()
-                                    print(respuesta_jugador1)
-
-                                    if respuesta_jugador1 == 0:
-                                        dibujar_texto("Q", fuente, negro, ventana, 30, 270)
-                                        comprobar_respuesta = False
-                                    elif respuesta_jugador1 == 1:
-                                        dibujar_texto("W", fuente, negro, ventana, 30, 335)
-                                        comprobar_respuesta = False
-                                    elif respuesta_jugador1 == 2:
-                                        dibujar_texto("E", fuente, negro, ventana, 30, 400)
-                                        comprobar_respuesta = False
-                                    elif respuesta_jugador1 == 3:
-                                        dibujar_texto("R", fuente, negro, ventana, 30, 465)
-                                        comprobar_respuesta = False
-
-                                print("el o los jugadores ya pulso una tecla - esperar resp jugador = ")
-                                print(esperando_respuesta_jugador)
-                                print("Compara la resp del jugador con la respuesta correcta")
-                                print(
-                                    resolver(preguntas, "viajes", num_de_pregunta_viajes, respuesta_jugador1))
+                                comprobar_resp_jugador1()
                                 pygame.display.update()
                                 esperando_respuesta_jugador = False
 
@@ -1443,6 +1315,8 @@ def juego_preguntas():
                     if continuar == 4:
                         mostrando_correcto_incorrecto = False
                         comprobar = False
+
+
 
                 if len(lista_preguntas_aeronauticas) > indice_turno:
                     juego_scroll()
@@ -1605,6 +1479,9 @@ fuente_timer = pygame.font.SysFont('Consolas', 30)
 juegoMultijugador = False
 musica_sonando = True
 
+respuesta_jugador1 = 4
+respuesta_jugador2 = 4
+
 # llevar el puntaje de cada jugador
 puntaje_jugador_1 = 0
 puntaje_jugador_2 = 0
@@ -1622,6 +1499,12 @@ transicion_triviaRect = imagentransicion_trivia.get_rect()
 transicion_carrera = pygame.image.load("AvionDespega.png")
 imagentransicion_carrera = pygame.transform.scale(transicion_carrera, (1000, 600))
 transicion_carreraRect = imagentransicion_carrera.get_rect()
+
+#imagen de los controles
+indicacion_controles_solitario = pygame.image.load("controles.png")
+indicacion_controles_multijugador = pygame.image.load("controles.png")
+
+
 
 # establece los sonidos del juego
 sonidoJuegoTerminado = pygame.mixer.Sound('aplausos.wav')
@@ -1846,4 +1729,3 @@ lista_preguntas_viajes = []
 
 
 menu_principal()
-
