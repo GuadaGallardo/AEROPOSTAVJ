@@ -237,8 +237,8 @@ def dibujar_pregunta(categoria, pregunta_id, turno):
     dibujar_texto_centrado(preguntas[categoria][pregunta_id]["opciones"][3], fuente_pequena, (0, 0, 0), ventana,
                   500, 480)
 
-    # dibuja
-    dibujar_texto("Toca la letra correspondiente a tu respuesta", fuente_mas_pequena, azul_marino, ventana, 320, 570)
+
+
 
 def dibujar_letras_jugador1():
     # dibuja las letras sobre los botones
@@ -303,8 +303,10 @@ def comprobar_resp_jugador2():
             comprobar_respuesta2 = False
 
 def resp_correcta_jugador(numero_jugador, puntos_ganados, x, y):
+
     global puntaje_jugador_1, puntaje_jugador_2
-    dibujar_texto("Correcto: sumas " + str(puntos_ganados) + " puntos", fuente_mas_pequena, verde_brillante, ventana, x, y)
+
+    dibujar_texto("Correcto: sumas " + str(puntos_ganados) + " puntos", fuente_pequena, verde_brillante, ventana, x, y)
     pygame.display.update()
     sonidoCorrecto.play()
 
@@ -316,7 +318,7 @@ def resp_correcta_jugador(numero_jugador, puntos_ganados, x, y):
 
 def resp_incorrecta_jugador(numero_jugador, x, y):
     global jugador1_acerto, jugador2_acerto
-    dibujar_texto("Incorrecto: no sumas puntos", fuente_mas_pequena, amarillo, ventana, x, y)
+    dibujar_texto("Incorrecto: no sumas puntos", fuente_pequena, amarillo, ventana, x, y)
 
     if numero_jugador == 1:
         jugador1_acerto = False
@@ -359,20 +361,20 @@ def juego_scroll():
     if indice_turno == 0:
         if juegoMultijugador == True:
             ventana.blit(indicacion_controles_solitario, (0, 0))
-            dibujar_texto('Presiona una tecla para comenzar', fuente_mas_pequena, negro, ventana, 355, 580)
+            dibujar_texto_centrado('Presiona una tecla para comenzar', fuente_pequena, negro, ventana, 500, 570)
             pygame.display.update()
             esperar_jugador()
         else:
             ventana.blit(indicacion_controles_solitario, (0, 0))
-            dibujar_texto('Presiona una tecla para comenzar', fuente_mas_pequena, negro, ventana, 355, 580)
+            dibujar_texto_centrado('Presiona una tecla para comenzar', fuente_pequena, negro, ventana, 500, 570)
             pygame.display.update()
             esperar_jugador()
 
     # Muestra la pantalla inicial
     ventana.blit(imagentransicion_carrera, transicion_carreraRect)
-    dibujar_texto('Despegando al próximo aeropuerto...', fuente, negro, ventana, 230, 10)
-    dibujar_texto('Las monedas que consigas se suman a tus puntos', fuente_pequena, azul_marino, ventana, 210, 50)
-    dibujar_texto('Presiona una tecla para avanzar', fuente_mas_pequena, negro, ventana, 355, 580)
+    dibujar_texto_centrado('Despegando al próximo aeropuerto...', fuente, negro, ventana, 500, 30)
+    #dibujar_texto('Las monedas que consigas se suman a tus puntos', fuente_pequena, azul_marino, ventana, 210, 50)
+    dibujar_texto_centrado('Presiona una tecla para avanzar', fuente_pequena, negro, ventana, 500, 590)
     # Detiene la musica
     pygame.mixer.music.stop()
     #cargar nueva cancion
@@ -749,7 +751,7 @@ def juego_preguntas():
     pygame.mixer.music.set_volume(0.2)
 
     if juegoMultijugador == True:
-        #dibujar_texto("Jugador 2: ", fuente_pequena, azul_marino, ventana, 800, 10)
+
         dibujar_texto("Puntos: " + str(puntaje_jugador_2), fuente_pequena, rojo, ventana, 830, 20)
         dibujar_texto('%s' % (monedas_jugador_2), fuente_pequena, rojo, ventana, 900, 55)
         moneda_jugador2_Rect.topleft = (850, 50)
@@ -759,9 +761,8 @@ def juego_preguntas():
     # Detiene el juego y muestra indicaciones para el jugador
 
     dibujar_texto('Aterrizando...', fuente, negro, ventana, 400, 10)
-    dibujar_texto('Presiona T para avanzar a la trivia o M para salir y volver menú', fuente_mas_pequena, negro, ventana,
-                  (ancho_ventana / 3) - 80, 580)
-    #dibujar_texto('o M para salir y volver menú', fuente_mas_pequena, negro, ventana,(ancho_ventana / 3) - 80, (alto_ventana / 3) + 80)
+    dibujar_texto_centrado('Presiona T para AVANZAR a la trivia o M para SALIR de la partida', fuente_pequena, negro, ventana,
+                           (ancho_ventana/2), 580)
 
     pygame.display.update()
 
@@ -833,12 +834,19 @@ def juego_preguntas():
 
             # actualizar el puntaje del jugador
             if fin_juego == False:
-                # dibujo puntaje y cantidad de items (monedas, etc)
-                dibujar_texto("Puntos: " + str(puntaje_jugador_1), fuente_pequena, azul_marino, ventana, 20, 570)
+
 
                 if juegoMultijugador == True:
+                    # dibujo puntaje y cantidad de items (monedas, etc)
+                    dibujar_texto("Puntos: " + str(puntaje_jugador_1), fuente_pequena, azul_marino, ventana, 20, 570)
+
+                    dibujar_texto_centrado("Jugador/a 1, indicá tu respuesta presionando una letra", fuente_pequena,
+                                           gris_azulado, ventana, 500, 30)
+
+
+
                     dibujar_texto("Puntos: " + str(puntaje_jugador_2), fuente_pequena, azul_marino, ventana,
-                                  (ancho_ventana - 200),
+                                  (ancho_ventana - 180),
                                   570)
 
                 # elegir la pregunta segun el turno
@@ -866,12 +874,16 @@ def juego_preguntas():
                     # creo la condicion para saber si la respuesta es correcta o no
                     if esperando_respuesta_jugador == True:
                         comprobar_resp_jugador1()
-                        pygame.display.update()
-                        esperando_respuesta_jugador = False
 
+                    ventana.blit(imagenFondo_trivia_arriba, (0, 0))
+                    dibujar_texto_centrado("Jugador/a 2, indicá tu respuesta presionando una letra", fuente_pequena,
+                                           gris_azulado, ventana, 500, 30)
+
+                    pygame.display.update()
+
+                    esperando_respuesta_jugador = False
                     # creo la condicion para saber si la respuesta es correcta o no
                     if esperando_respuesta_jugador2 == True:
-
                         comprobar_resp_jugador2()
                         pygame.display.update()
                         esperando_respuesta_jugador2 = False
@@ -880,30 +892,34 @@ def juego_preguntas():
 
                         # compara resultado de la resp del jugador 1 con la correcta
                         if resolver(preguntas, "aeronautica", num_de_pregunta_aeronautica, respuesta_jugador1) == True:
-                            resp_correcta_jugador(1, 100, 20, 520)
-
+                            resp_correcta_jugador(1, 100, 20, 530)
 
                         else:
-                            resp_incorrecta_jugador(1, 20, 520)
+                            resp_incorrecta_jugador(1, 20, 530)
 
                         # comprueba la respuesta del jugador 2 con la correcta
 
                         if resolver(preguntas, "aeronautica", num_de_pregunta_aeronautica, respuesta_jugador2) == True:
-                            resp_correcta_jugador(2, 100, 600, 520)
-
+                            resp_correcta_jugador(2, 100, 620, 530)
 
                         else:
-                            resp_incorrecta_jugador(2, 620, 520)
+                            resp_incorrecta_jugador(2, 620, 530)
                     else:
                         continue
 
-
+                    ventana.blit(imagenFondo_trivia_arriba, (0, 0))
+                    dibujar_texto_centrado("Ahora presionen la tecla S para continuar", fuente_pequena, negro, ventana, 500, 30)
+                    pygame.display.update()
 
                     # caso 1 .. solo el jugador 1 fallo
 
                     if jugador1_acerto == False and jugador2_acerto == True:
 
                         ventana.blit(fondo_preguntas, fondo_preguntasRect)
+
+                        dibujar_texto_centrado("Jugador/a 1, fallaste", fuente_pequena, gris_azulado, ventana, 500, 20)
+                        dibujar_texto_centrado("pero tenes revancha contestando una pregunta de viajes", fuente_pequena,
+                            gris_azulado, ventana, 500, 50)
 
                         # dibuja las letras sobre los botones
                         dibujar_letras_jugador1()
@@ -914,7 +930,7 @@ def juego_preguntas():
                         # dibuja las letras sobre los botones
                         dibujar_letras_jugador2()
                         dibujar_texto("Puntaje Total: " + str(puntaje_jugador_2), fuente_pequena, azul_marino,
-                                      ventana, 850, 570)
+                                      ventana, 780, 570)
 
                         responder_viajes = True
                         while responder_viajes:
@@ -947,10 +963,10 @@ def juego_preguntas():
 
                             # compara resultado de la resp del jugador 1 con la correcta
                             if resolver(preguntas, "viajes", num_de_pregunta_viajes, respuesta_jugador1) == True:
-                               resp_correcta_jugador(1, 50, 20, 520)
+                               resp_correcta_jugador(1, 50, 20, 530)
 
                             else:
-                                resp_incorrecta_jugador(1, 20, 520)
+                                resp_incorrecta_jugador(1, 20, 530)
 
 
                         else:
@@ -960,16 +976,20 @@ def juego_preguntas():
                     elif jugador2_acerto == False and jugador1_acerto == True:
 
                         ventana.blit(fondo_preguntas, fondo_preguntasRect)
+                        dibujar_texto_centrado("Jugador/a 2, fallaste pero tenes revancha",
+                                               fuente_pequena,
+                                               gris_azulado, ventana, 500, 30)
+
                         # dibuja las letras sobre los botones
                         dibujar_letras_jugador1()
-                        dibujar_texto("Puntaje Total: " + str(puntaje_jugador_1), fuente_pequena, azul_marino,
+                        dibujar_texto("Puntaje: " + str(puntaje_jugador_1), fuente_pequena, azul_marino,
                                       ventana,
                                       20, 570)
 
                         # dibuja las letras sobre los botones
                         dibujar_letras_jugador2()
-                        dibujar_texto("Puntaje Total: " + str(puntaje_jugador_2), fuente_pequena, azul_marino,
-                                      ventana, 850, 570)
+                        dibujar_texto("Puntaje: " + str(puntaje_jugador_2), fuente_pequena, azul_marino,
+                                      ventana, 780, 570)
 
                         responder_viajes = True
                         while responder_viajes:
@@ -995,20 +1015,16 @@ def juego_preguntas():
                             pygame.display.update()
                             esperando_respuesta_jugador2 = False
 
-
-
                         if esperando_respuesta_jugador2 == False:
 
                             # comprueba la respuesta del jugador 2 con la correcta
 
                             if resolver(preguntas, "viajes", num_de_pregunta_viajes, respuesta_jugador2) == True:
 
-                                resp_correcta_jugador(2, 50, 620, 520)
-
+                                resp_correcta_jugador(2, 50, 620, 530)
 
                             else:
-                                resp_incorrecta_jugador(2, 620, 520)
-
+                                resp_incorrecta_jugador(2, 620, 530)
 
                         else:
                             continue
@@ -1017,16 +1033,23 @@ def juego_preguntas():
                     elif jugador2_acerto == False and jugador1_acerto == False:
 
                         ventana.blit(fondo_preguntas, fondo_preguntasRect)
+
+                        dibujar_texto_centrado("Fallaron. Pero tienen revancha...",
+                                               fuente_pequena,
+                                               gris_azulado, ventana, 500, 20)
+                        dibujar_texto_centrado("Jugador/a 1, contestas primero",
+                                               fuente_pequena,
+                                               gris_azulado, ventana, 500, 50)
                         # dibuja las letras sobre los botones
                         dibujar_letras_jugador1()
-                        dibujar_texto("Puntaje Total: " + str(puntaje_jugador_1), fuente_pequena, azul_marino,
+                        dibujar_texto("Puntaje: " + str(puntaje_jugador_1), fuente_pequena, azul_marino,
                                       ventana,
                                       20, 570)
 
                         # dibuja las letras sobre los botones
                         dibujar_letras_jugador2()
-                        dibujar_texto("Puntaje Total: " + str(puntaje_jugador_2), fuente_pequena, azul_marino,
-                                      ventana, 850, 570)
+                        dibujar_texto("Puntaje: " + str(puntaje_jugador_2), fuente_pequena, azul_marino,
+                                      ventana, 780, 570)
 
                         responder_viajes = True
                         while responder_viajes:
@@ -1056,6 +1079,11 @@ def juego_preguntas():
                         else:
                             continue
 
+                        ventana.blit(imagenFondo_trivia_arriba, (0, 0))
+                        dibujar_texto_centrado("Jugador/a 2, ahora contestas vos",
+                                               fuente_pequena,
+                                               gris_azulado, ventana, 500, 30)
+                        pygame.display.update()
 
                         esperando_respuesta_jugador2 = True
                         # creo la condicion para saber si la respuesta es correcta o no
@@ -1069,23 +1097,24 @@ def juego_preguntas():
                         #if esperando_respuesta_jugador == False:  # or
                         if esperando_respuesta_jugador2 == False:
 
+                            ventana.blit(imagenFondo_trivia_arriba, (0, 0))
 
                             # compara resultado de la resp del jugador 1 con la correcta
                             if resolver(preguntas, "viajes", num_de_pregunta_viajes, respuesta_jugador1) == True:
-                                resp_correcta_jugador(1, 100, 20, 520)
+                                resp_correcta_jugador(1, 100, 20, 530)
 
 
                             else:
-                                resp_incorrecta_jugador(1, 20, 520)
+                                resp_incorrecta_jugador(1, 20, 530)
 
 
                             # comprueba la respuesta del jugador 2 con la correcta
 
                             if resolver(preguntas, "viajes", num_de_pregunta_viajes, respuesta_jugador2) == True:
-                                resp_correcta_jugador(2, 50, 620, 520)
+                                resp_correcta_jugador(2, 50, 620, 530)
 
                             else:
-                               resp_incorrecta_jugador(2,620, 520)
+                               resp_incorrecta_jugador(2, 620, 530)
 
 
                         else:
@@ -1095,6 +1124,12 @@ def juego_preguntas():
 
                 else:
                     print("modo solitario")
+
+                    # dibujo puntaje y cantidad de items (monedas, etc)
+                    dibujar_texto("Puntos: " + str(puntaje_jugador_1), fuente_pequena, azul_marino, ventana, 20, 570)
+
+                    dibujar_texto_centrado("Presiona una tecla para elegir cuál es la opción correcta", fuente_pequena, gris_azulado, ventana, 500, 30)
+                    pygame.display.update()
 
                     # creo la condicion para saber si la respuesta es correcta o no
                     if esperando_respuesta_jugador == True:
@@ -1106,20 +1141,25 @@ def juego_preguntas():
                         # compara resultado de la resp del jugador 1 con la correcta
                         if resolver(preguntas, "aeronautica", num_de_pregunta_aeronautica, respuesta_jugador1) == True:
 
-                            resp_correcta_jugador(1, 100, 20, 520)
+                            resp_correcta_jugador(1, 100, 330, 530)
 
                         else:
+                            ventana.blit(imagenFondo_trivia_arriba, (0, 0))
+                            dibujar_texto_centrado("Presiona S para avanzar", fuente_pequena, negro, ventana, 500,
+                                                   30)
 
-                            dibujar_texto("Presiona S para jugar por 50 puntos", fuente_mas_pequena, negro, ventana, 20, 550)
-                            resp_incorrecta_jugador(1, 20, 520)
+                            resp_incorrecta_jugador(1, 330, 530)
 
 
                     if jugador1_acerto == False:
+
                         ventana.blit(fondo_preguntas, fondo_preguntasRect)
+
                         # dibuja las letras sobre los botones
                         dibujar_letras_jugador1()
                         dibujar_texto("Puntaje Total: " + str(puntaje_jugador_1), fuente_pequena, azul_marino, ventana,
                                       20, 570)
+
                         responder_viajes = True
                         while responder_viajes:
 
@@ -1133,6 +1173,12 @@ def juego_preguntas():
 
                             # dibuja la pregunta y sus respuestas en la pantalla, y el turno de juego
                             dibujar_pregunta("viajes", num_de_pregunta_viajes, indice_turno)
+
+                            ventana.blit(imagenFondo_trivia_arriba, (0, 0))
+                            dibujar_texto_centrado("Fallaste, pero tenes revancha", fuente_pequena, gris_azulado, ventana,
+                                                   500,
+                                                   30)
+
                             pygame.display.update()
 
                             # cambio la condicion de la bandera de esperar al jugador
@@ -1141,23 +1187,26 @@ def juego_preguntas():
                             # creo la condicion para saber si la respuesta es correcta o no
                             if esperando_respuesta_jugador == True:
                                 comprobar_resp_jugador1()
+
                                 pygame.display.update()
 
                                 esperando_respuesta_jugador = False
 
                                 # compara resultado de la resp del jugador 1 con la correcta
                                 if resolver(preguntas, "viajes", num_de_pregunta_viajes, respuesta_jugador1) == True:
-                                    resp_correcta_jugador(1, 50, 20, 520)
+                                    resp_correcta_jugador(1, 50, 330, 530)
 
                                 else:
-                                    resp_incorrecta_jugador(1, 20, 520)
+                                    resp_incorrecta_jugador(1, 330, 530)
 
                 # vuelvo al estado inicial la bandera
                 jugador1_acerto = True
                 jugador2_acerto = True
 
-                dibujar_texto("Presionen S para despegar al próximo aeropuerto", fuente_mas_pequena, negro, ventana, 20,
-                              550)
+                ventana.blit(imagenFondo_trivia_arriba, (0, 0))
+                dibujar_texto_centrado("Ahora presiona la tecla S para despegar al próximo aeropuerto", fuente_pequena, negro, ventana, 500,
+                              30)
+
                 # dibujo puntaje y cantidad de items (monedas, etc)
 
                 pygame.display.update()
@@ -1198,29 +1247,26 @@ def juego_preguntas():
         fin_juego = True
         print("Fin del juego")
 
-        dibujar_texto("FIN DEL JUEGO", fuente, negro, ventana, (ancho_ventana / 3), 420)
-        dibujar_texto("Gracias a tus monedas sumas: " + str(monedas_jugador_1) + " puntos.", fuente_pequena,
-                      azul_marino, ventana, 100,
-                      480)
+        dibujar_texto_centrado("FIN DEL JUEGO", fuente, negro, ventana, 500, 420)
+        #dibujar_texto("Gracias a tus monedas sumas: " + str(monedas_jugador_1) + " puntos.", fuente_pequena, azul_marino, ventana, 100, 480)
         puntaje_jugador_1 += monedas_jugador_1
-        dibujar_texto("Puntaje Total Jugador 1: " + str(puntaje_jugador_1), fuente_pequena, azul_marino, ventana, 100,
-                      520)
+        dibujar_texto_centrado("Puntaje Total Jugador 1: " + str(puntaje_jugador_1), fuente_pequena, azul_marino, ventana, 500, 500)
 
         if juegoMultijugador == True:
 
-            dibujar_texto("Gracias a tus monedas sumas: " + str(monedas_jugador_2) + " puntos.", fuente_pequena,
-                          azul_marino, ventana, 100, 480)
+            dibujar_texto("Puntaje Total Jugador 1: " + str(puntaje_jugador_1), fuente_pequena, azul_marino, ventana,
+                          100, 500)
+            #dibujar_texto("Gracias a tus monedas sumas: " + str(monedas_jugador_2) + " puntos.", fuente_pequena, azul_marino, ventana, 530, 480)
             puntaje_jugador_2 += monedas_jugador_2
             dibujar_texto("Puntaje Total Jugador 2: " + str(puntaje_jugador_2), fuente_pequena, azul_marino, ventana,
-                          550, 480)
+                          550, 500)
             if puntaje_jugador_1 > puntaje_jugador_2:
-                dibujar_texto("Jugador 1 sos el GANADOR", fuente_pequena, negro, ventana, 350, 520)
+                dibujar_texto_centrado("Jugador 1 sos el GANADOR", fuente_pequena, azul_marino, ventana, 500, 530)
             elif puntaje_jugador_1 == puntaje_jugador_2:
-                dibujar_texto("Es un empate", fuente_pequena, negro, ventana, (ancho_ventana / 2) - 50, 520)
+                dibujar_texto_centrado("Es un empate", fuente_pequena, azul_marino, ventana, 500, 530)
             else:
-                dibujar_texto("Jugador 2 sos el GANADOR", fuente_pequena, negro, ventana, 350, 520)
-        dibujar_texto("Presioná M para volver al menú", fuente_mas_pequena, azul_marino, ventana, (ancho_ventana / 3),
-                      570)
+                dibujar_texto_centrado("Jugador 2 sos el GANADOR", fuente_pequena, azul_marino, ventana, 500, 530)
+        dibujar_texto_centrado("Presioná M para volver al menú", fuente_pequena, negro, ventana, 500, 570)
 
         pygame.display.update()
 
@@ -1362,6 +1408,9 @@ transicion_triviaRect = imagentransicion_trivia.get_rect()
 transicion_carrera = pygame.image.load("AvionDespega.png")
 imagentransicion_carrera = pygame.transform.scale(transicion_carrera, (1000, 600))
 transicion_carreraRect = imagentransicion_carrera.get_rect()
+
+#imagen fondo arriba trivia
+imagenFondo_trivia_arriba = pygame.image.load("fondArribaTrivia.png")
 
 #imagen de los controles
 indicacion_controles_solitario = pygame.image.load("controles.png")
