@@ -3,6 +3,7 @@ from pygame.locals import *
 import random
 import sys
 import os
+import funciones_scroll as fs
 
 
 # funciones varias
@@ -341,7 +342,7 @@ def resp_incorrecta_jugador(numero_jugador, x, y):
 
 # --------------------###################-------------------------------------##############
 # funciones del scroll
-
+'''
 def jugadorGolpeaMoneda(rectanguloJugador, monedas):
     for moneda in monedas:
         if rectanguloJugador.colliderect(moneda['rect']):
@@ -364,6 +365,7 @@ def jugadorGolpeaEdificio(rectanguloJugador, edificios):
             ventana.blit(edificio['superficie2'], edificio['rect'])
             return True
     return False
+'''
 # --------------------###################-------------------------------------##############
 
 def juego_scroll():
@@ -567,13 +569,13 @@ def juego_scroll():
 
             # Verifica si alguna moneda impactó en el jugador.
 
-            if jugadorGolpeaMoneda(rectanguloJugador, monedas):
+            if fs.jugadorGolpeaMoneda(rectanguloJugador, monedas):
                 cantidad_monedas_1 += 5  # incrementa el puntaje
                 sonidoSumaMoneda.play()
 
             if juegoMultijugador == True:
 
-                if jugadorGolpeaMoneda(rectanguloJugador2, monedas):
+                if fs.jugadorGolpeaMoneda(rectanguloJugador2, monedas):
                     cantidad_monedas_2 += 5  # incrementa el puntaje
                     sonidoSumaMoneda.play()
 
@@ -606,14 +608,14 @@ def juego_scroll():
 
             # Verifica si alguna nube impactó en el jugador.
 
-            if jugadorGolpeaNube(rectanguloJugador, nubes):
+            if fs.jugadorGolpeaNube(ventana, rectanguloJugador, nubes):
                 if cantidad_monedas_1 > 0:
                     cantidad_monedas_1 -= 1  #   disminuye el puntaje
                     sonidoTrueno.play()
 
             if juegoMultijugador == True:
 
-                if jugadorGolpeaNube(rectanguloJugador2, nubes):
+                if fs.jugadorGolpeaNube(ventana, rectanguloJugador2, nubes):
                     if cantidad_monedas_2 > 0:
                         cantidad_monedas_2 -= 1  # disminuye el puntaje
                         sonidoTrueno.play()
@@ -650,7 +652,7 @@ def juego_scroll():
 
             # Verifica si algun edificio impactó en el jugador.
 
-            if jugadorGolpeaEdificio(rectanguloJugador, edificios):
+            if fs.jugadorGolpeaEdificio(ventana, rectanguloJugador, edificios):
                 jugador1_toco_edificio = True
                 #if cantidad_monedas_1 > 0:
                  #   cantidad_monedas_1 -= 1  # disminuye el puntaje
@@ -658,7 +660,7 @@ def juego_scroll():
 
             if juegoMultijugador == True:
 
-                if jugadorGolpeaEdificio(rectanguloJugador2, edificios):
+                if fs.jugadorGolpeaEdificio(ventana, rectanguloJugador2, edificios):
                     jugador2_toco_edificio = True
                     #if cantidad_monedas_2 > 0:
                      #   cantidad_monedas_2 -= 1  # disminuye el puntaje
@@ -908,7 +910,7 @@ def juego_preguntas():
                 if esperando_respuesta_jugador == False and esperando_respuesta_jugador2 == False:
 
                     # compara resultado de la resp del jugador 1 con la correcta
-                    if resolver(preguntas, "aeronautica", num_de_pregunta_aeronautica, respuesta_jugador1) == True:
+                    if resolver(preguntas, "aeronautica", num_de_pregunta_aeronautica, respuesta_jugador1):
                         resp_correcta_jugador(1, 100, 20, 530)
 
                     else:
@@ -916,7 +918,7 @@ def juego_preguntas():
 
                     # comprueba la respuesta del jugador 2 con la correcta
 
-                    if resolver(preguntas, "aeronautica", num_de_pregunta_aeronautica, respuesta_jugador2) == True:
+                    if resolver(preguntas, "aeronautica", num_de_pregunta_aeronautica, respuesta_jugador2):
                         resp_correcta_jugador(2, 100, 620, 530)
 
                     else:
@@ -981,7 +983,7 @@ def juego_preguntas():
                     if esperando_respuesta_jugador == False:  # or esperando_respuesta_jugador2 == False:
 
                         # compara resultado de la resp del jugador 1 con la correcta
-                        if resolver(preguntas, "viajes", num_de_pregunta_viajes, respuesta_jugador1) == True:
+                        if resolver(preguntas, "viajes", num_de_pregunta_viajes, respuesta_jugador1):
                            resp_correcta_jugador(1, 50, 20, 530)
 
                         else:
@@ -1644,7 +1646,7 @@ preguntas = {
             "correcta": 3
         },
         10: {
-            "pregunta": "¿Qué instrumentos quedaran inoperativos si se bloquea el tubo pitot?",
+            "pregunta": "¿Qué instrumento quedará inoperativo si se bloquea el tubo pitot?",
             "opciones": {
                 0: "Altimetro",
                 1: "Termómetro",
@@ -1785,3 +1787,4 @@ lista_preguntas_viajes = []
 
 
 menu_principal()
+
