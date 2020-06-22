@@ -425,6 +425,8 @@ def juego_scroll():
         #nubes
         nubes = []
         edificios = []
+        jugador1_toco_edificio = False
+        jugador2_toco_edificio = False
 
         # situo a los jugadores en la pantalla
         rectanguloJugador.topleft = (100, alto_ventana - 50)  # jugador 1 a la izquierda
@@ -531,11 +533,6 @@ def juego_scroll():
             if posicion_en_y1 > alto:
                 posicion_en_y1 = -alto
 
-            #dibujo la separacion de la ventana
-            if juegoMultijugador == True:
-                #ancho de las nubes 28 px
-                rectanguloNubesDivisoras.topleft = (485, 0)
-                ventana.blit(imagenNubesDivisoras, rectanguloNubesDivisoras)
 
 ###########------- MONEDAS ---------------------------#####################------------------------------
 
@@ -605,9 +602,6 @@ def juego_scroll():
                 if nube['rect'].top > alto_ventana:
                     nubes.remove(nube)
 
-            # Dibuja cada nube
-            for nube in nubes:
-                ventana.blit(nube['superficie'], nube['rect'])
 
 
             # Verifica si alguna nube impactó en el jugador.
@@ -626,7 +620,7 @@ def juego_scroll():
 
 
 #########------------- EDIFICIOS --------------------###########------------------##################------------
-            '''
+
             # Añade edificios como obstaculos en la parte superior de la pantalla
             contadorAgregarEdificio += 1
 
@@ -638,7 +632,7 @@ def juego_scroll():
                                         tamanoEdificio, tamanoEdificio),
                     'velocidad': 2,  # debe coincidir con la velocidad del scroll para aparentar que esta en el suelo o estatico
                     'superficie': pygame.transform.scale(imagenEdificioObstaculo, (tamanoEdificio, tamanoEdificio)),
-                    'superficie2': pygame.transform.scale(imagenNubeColision, (tamanoEdificio, tamanoEdificio))
+                    'superficie2': pygame.transform.scale(imagenEdificioColision, (tamanoEdificio, tamanoEdificio))
                 }
                 edificios.append(nuevoEdificio)
 
@@ -657,18 +651,25 @@ def juego_scroll():
             # Verifica si algun edificio impactó en el jugador.
 
             if jugadorGolpeaEdificio(rectanguloJugador, edificios):
-                if cantidad_monedas_1 > 0:
-                    cantidad_monedas_1 -= 1  # disminuye el puntaje
-                    sonidoGolpeEdificio.play()
+                jugador1_toco_edificio = True
+                #if cantidad_monedas_1 > 0:
+                 #   cantidad_monedas_1 -= 1  # disminuye el puntaje
+                sonidoGolpeEdificio.play()
 
             if juegoMultijugador == True:
 
                 if jugadorGolpeaEdificio(rectanguloJugador2, edificios):
-                    if cantidad_monedas_2 > 0:
-                        cantidad_monedas_2 -= 1  # disminuye el puntaje
-                        sonidoGolpeEdificio.play()
+                    jugador2_toco_edificio = True
+                    #if cantidad_monedas_2 > 0:
+                     #   cantidad_monedas_2 -= 1  # disminuye el puntaje
+                    sonidoGolpeEdificio.play()
 
-            '''
+
+            # Dibuja cada nube luego de los edificios para que parezca q ellos estan en el suelo
+            for nube in nubes:
+                ventana.blit(nube['superficie'], nube['rect'])
+
+
 ########--------Movimiento jugadores -------------------------###########------------------##################------------
 
             moneda_jugador1_Rect.topleft = (10, 0)
@@ -676,39 +677,46 @@ def juego_scroll():
 
             if juegoMultijugador == False:
 
-                # Mueve el avion del jugador 1.
-                #al ser hasta cero no deja que escape de la pantalla
-                if moverIzquierda and rectanguloJugador.left > 0:
-                    rectanguloJugador.move_ip(-1 * movimiento_jugador, 0)
-                if moverDerecha and rectanguloJugador.right < ancho_ventana:
-                    rectanguloJugador.move_ip(movimiento_jugador, 0)
-                if moverArriba and rectanguloJugador.top > 0:
-                    rectanguloJugador.move_ip(0, -1 * movimiento_jugador)
-                if moverAbajo and rectanguloJugador.bottom < alto_ventana:
-                    rectanguloJugador.move_ip(0, movimiento_jugador)
+                if jugador1_toco_edificio == False:
+
+                    # Mueve el avion del jugador 1.
+                    #al ser hasta cero no deja que escape de la pantalla
+                    if moverIzquierda and rectanguloJugador.left > 0:
+                        rectanguloJugador.move_ip(-1 * movimiento_jugador, 0)
+                    if moverDerecha and rectanguloJugador.right < ancho_ventana:
+                        rectanguloJugador.move_ip(movimiento_jugador, 0)
+                    if moverArriba and rectanguloJugador.top > 0:
+                        rectanguloJugador.move_ip(0, -1 * movimiento_jugador)
+                    if moverAbajo and rectanguloJugador.bottom < alto_ventana:
+                        rectanguloJugador.move_ip(0, movimiento_jugador)
+
+                else:
+                    continue
 
             if juegoMultijugador == True:
 
-                # Mueve el avion del jugador 1.
-                # al ser hasta cero no deja que escape de la pantalla
-                if moverIzquierda and rectanguloJugador.left > 0:
-                    rectanguloJugador.move_ip(-1 * movimiento_jugador, 0)
-                if moverDerecha and rectanguloJugador.right < 483:  # ancho de pantalla sin contar las nubes divisorias
-                    rectanguloJugador.move_ip(movimiento_jugador, 0)
-                if moverArriba and rectanguloJugador.top > 0:
-                    rectanguloJugador.move_ip(0, -1 * movimiento_jugador)
-                if moverAbajo and rectanguloJugador.bottom < alto_ventana:
-                    rectanguloJugador.move_ip(0, movimiento_jugador)
+                if jugador1_toco_edificio == False:
+                    # Mueve el avion del jugador 1.
+                    # al ser hasta cero no deja que escape de la pantalla
+                    if moverIzquierda and rectanguloJugador.left > 0:
+                        rectanguloJugador.move_ip(-1 * movimiento_jugador, 0)
+                    if moverDerecha and rectanguloJugador.right < 483:  # ancho de pantalla sin contar las nubes divisorias
+                        rectanguloJugador.move_ip(movimiento_jugador, 0)
+                    if moverArriba and rectanguloJugador.top > 0:
+                        rectanguloJugador.move_ip(0, -1 * movimiento_jugador)
+                    if moverAbajo and rectanguloJugador.bottom < alto_ventana:
+                        rectanguloJugador.move_ip(0, movimiento_jugador)
 
-                # Mueve el avion del jugador 2.
-                if moverIzquierda2 and rectanguloJugador2.left > 517: #ancho de pantalla contando las nubes divisorias
-                    rectanguloJugador2.move_ip(-1 * movimiento_jugador, 0)
-                if moverDerecha2 and rectanguloJugador2.right < ancho_ventana:
-                    rectanguloJugador2.move_ip(movimiento_jugador, 0)
-                if moverArriba2 and rectanguloJugador2.top > 0:
-                    rectanguloJugador2.move_ip(0, -1 * movimiento_jugador)
-                if moverAbajo2 and rectanguloJugador2.bottom < alto_ventana:
-                    rectanguloJugador2.move_ip(0, movimiento_jugador)
+                if jugador2_toco_edificio == False:
+                    # Mueve el avion del jugador 2.
+                    if moverIzquierda2 and rectanguloJugador2.left > 517: #ancho de pantalla contando las nubes divisorias
+                        rectanguloJugador2.move_ip(-1 * movimiento_jugador, 0)
+                    if moverDerecha2 and rectanguloJugador2.right < ancho_ventana:
+                        rectanguloJugador2.move_ip(movimiento_jugador, 0)
+                    if moverArriba2 and rectanguloJugador2.top > 0:
+                        rectanguloJugador2.move_ip(0, -1 * movimiento_jugador)
+                    if moverAbajo2 and rectanguloJugador2.bottom < alto_ventana:
+                        rectanguloJugador2.move_ip(0, movimiento_jugador)
 
             # Dibuja cantidad de monedas
             dibujar_texto('%s' % (cantidad_monedas_1), fuente_pequena, verde_brillante, ventana, 55, 5)
@@ -720,6 +728,12 @@ def juego_scroll():
                 dibujar_texto('%s' % (cantidad_monedas_2), fuente_pequena, rojo, ventana, 955,
                               5)
                 ventana.blit(imagenJugador2, rectanguloJugador2)
+
+            # dibujo la separacion de la ventana
+            if juegoMultijugador == True:
+                # ancho de las nubes 28 px
+                rectanguloNubesDivisoras.topleft = (485, 0)
+                ventana.blit(imagenNubesDivisoras, rectanguloNubesDivisoras)
 
             # timer
             dibujar_texto(texto_timer, fuente_timer, negro, ventana, 480, 10)
@@ -1441,16 +1455,16 @@ transicion_carreraRect = imagentransicion_carrera.get_rect()
 imagenFondo_trivia_arriba = pygame.image.load("fondArribaTrivia.png")
 
 #imagen de los controles
-indicacion_controles_solitario_scroll = pygame.image.load("controles.png")
+#indicacion_controles_solitario_scroll = pygame.image.load("controles.png")
 indicacion_controles_multijugador_scroll = pygame.image.load("PantallaInstruccionesMultijugadorScroll.png")
 
-
+#establece la musica de inicio
+musicaFondo = pygame.mixer.music.load('musicafondo1.wav')
 
 # establece los sonidos del juego
 sonidoJuegoTerminado = pygame.mixer.Sound('aplausos.wav')
 sonidoSumaMoneda = pygame.mixer.Sound('moneda3.wav')
 sonidoTrueno = pygame.mixer.Sound('trueno1.wav')
-musicaFondo = pygame.mixer.music.load('musicafondo1.wav')
 sonidoCorrecto = pygame.mixer.Sound('sonidoCorrecto.wav')
 sonidoIncorrecto = pygame.mixer.Sound('sonidoIncorrecto.wav')
 sonidoGolpeEdificio = pygame.mixer.Sound('golpeEdificio.wav')
@@ -1477,9 +1491,9 @@ tamano_min_nube = 60
 tamano_max_nube = 80
 
 #edificios
-tasa_nueva_edificio = 50
-tamano_min_edificio = 60
-tamano_max_edificio = 80
+tasa_nueva_edificio = 90
+tamano_min_edificio = 80
+tamano_max_edificio = 120
 
 
 #jugador
@@ -1510,6 +1524,9 @@ rectanguloNubeColision = pygame.Rect(0, 0, 65, 45)
 # establece las imagenes del edificio (obstaculo)
 imagenEdificioObstaculo = pygame.image.load('EdificioObstaculo.png')
 rectanguloEdificioObstaculo = pygame.Rect(0, 0, 65, 45)
+
+imagenEdificioColision = pygame.image.load('EdificiosColision.png')
+rectanguloEdificioColision = pygame.Rect(0, 0, 65, 45)
 
 
 # establece las imagenes de las monedas
